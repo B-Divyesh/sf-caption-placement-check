@@ -3,8 +3,8 @@
 .site-header nav, .site-footer nav { display: flex; align-items: center; gap: 28px; }
 .site-header nav a, .site-footer nav a { min-height: 44px; display: inline-flex; align-items: center; color: var(--mist); text-decoration: none; }
 .site-header nav a:hover, .site-footer nav a:hover { color: var(--paper); }
-.hero { display: grid; min-height: 720px; grid-template-columns: .9fr 1.35fr; align-items: center; gap: 56px; padding-block: 72px; }
-.hero h1 { max-width: 580px; font-size: clamp(3.2rem, 6.5vw, 5.7rem); }
+.hero { display: grid; min-height: 720px; grid-template-columns: 1fr 1.2fr; align-items: center; gap: 48px; padding-block: 56px; }
+.hero h1 { max-width: 600px; font-size: clamp(3.2rem, 5vw, 4.5rem); }
 .hero-lead { max-width: 600px; color: var(--mist); font-size: clamp(18px, 2vw, 22px); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .action-note { margin: 10px 0 0; color: var(--mist); font-size: 14px; }

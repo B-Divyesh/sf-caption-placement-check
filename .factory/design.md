@@ -33,7 +33,7 @@ Type scale: 14 label, 16 body, 20 lead, 26 section, 40 workspace title, and clam
 - Drop zones look like a projected aperture, with corner marks rather than a dashed framework rectangle.
 - Findings are cue slips: timecode, evidence, recommendation, and a reviewed toggle. Selecting one seeks the video and reveals its region.
 - Overlay regions use a hatched amber fill for advisories; manual protected regions use solid mint corners. The video frame is always primary.
-- The free workflow supports full scans and review. A one-time Studio unlock adds reusable protected-region presets and JSON project reports; accessibility findings, safe-zone recommendations, and CSV export remain free.
+- Scanning, protected-region presets, alerts, CSV, and JSON reports all remain local and free. No purchase surface appears until the external billing product exists.
 
 ## Motion policy
 
@@ -47,7 +47,7 @@ At desktop widths the frame and cue list share the bench. Below 860px they stack
 
 - Hero: original 3:2 environmental illustration generated with the factory Azure image deployment on 2026-08-28. Prompt sheet below. Source PNG and prompt JSON live in `assets/src/`; optimized WebP lives in `public/assets/`.
 - Social preview: original 1200×630 projection-theatre crop generated with the same factory deployment on 2026-08-28, reviewed for text artifacts, brands, and unintended symbols. It contains no readable text, logos, or identifiable people. Prompt provenance is `public/assets/social-projection-room.png.json`; the final PNG is a crop composed from that original render.
-- App mark and interface icons: hand-authored geometric SVG/CSS (frame corners, cue mark, arrows), MIT-covered with this repository.
+- App mark and interface icons: hand-authored geometric SVG/CSS (frame corners, alert mark, arrows), MIT-covered with this repository. The 180px touch icon is a raster export of that mark.
 - No stock assets, third-party logos, real people, or copyrighted characters.
 
 ### Hero prompt sheet

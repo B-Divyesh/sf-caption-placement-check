@@ -125,7 +125,7 @@ test("@claim:offline-demo reloads the shipped demo after its first visit", async
   await expect(page.locator("#scan-summary")).toContainText("2 captions checked", { timeout: 20_000 });
   await expect.poll(() => page.locator("html").getAttribute("data-offline-ready")).toBe("true");
   expect(await page.evaluate(async () => {
-    const cache = await caches.open("caption-placement-check-v9");
+    const cache = await caches.open("caption-placement-check-v10");
     const assets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
       .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
     return Promise.all(assets.map(async (asset) => {

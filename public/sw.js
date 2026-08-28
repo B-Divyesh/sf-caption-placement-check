@@ -1,4 +1,4 @@
-const CACHE = "caption-placement-check-v9";
+const CACHE = "caption-placement-check-v10";
 const SHELL = ["/", "/privacy/", "/terms/", "/404.html", "/icon.svg", "/apple-touch-icon.png", "/assets/hero-projection-room.webp", "/demo/sample.webm", "/demo/sample.srt"];
 
 // Cache Storage exposes a decoded body for compressed development and hosting
