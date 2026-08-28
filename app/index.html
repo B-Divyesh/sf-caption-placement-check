@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <title>Caption Placement Check — local video preflight</title>
+  </head>
+  <body class="app-shell">
+    <a class="skip-link" href="#main">Skip to checker</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a>
+      <div class="local-badge"><span aria-hidden="true">●</span> Media stays on this device</div>
+    </header>
+    <main id="main" class="workspace">
+      <section class="workspace-intro" aria-labelledby="app-title">
+        <div><p class="eyebrow">Accessibility preflight · New check</p><h1 id="app-title">Catch captions that cover what matters.</h1></div>
+        <button class="quiet-button" id="new-check" type="button">New check</button>
+      </section>
+
+      <section id="setup" class="setup" aria-labelledby="setup-title">
+        <div class="section-heading"><span class="step-number">01</span><div><h2 id="setup-title">Add your exports</h2><p>Choose one video and its final SRT or WebVTT captions. Nothing is uploaded.</p></div></div>
+        <div class="file-grid">
+          <label class="drop-aperture" id="video-drop" for="video-file">
+            <input id="video-file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v" />
+            <span class="aperture-icon video-icon" aria-hidden="true"></span>
+            <strong>Add video</strong><span id="video-detail">MP4, WebM, MOV, or M4V</span>
+          </label>
+          <label class="drop-aperture" id="caption-drop" for="caption-file">
+            <input id="caption-file" type="file" accept=".srt,.vtt,text/vtt,application/x-subrip" />
+            <span class="aperture-icon caption-icon" aria-hidden="true"></span>
+            <strong>Add captions</strong><span id="caption-detail">SRT or WebVTT</span>
+          </label>
+        </div>
+        <div class="error-banner" id="input-error" role="alert" hidden></div>
+        <div class="setup-actions">
+          <label class="placement-select" for="placement"><span>Expected caption position</span><select id="placement"><option value="bottom">Bottom center</option><option value="top">Top center</option></select></label>
+          <button class="primary-button" id="start-scan" type="button" disabled>Scan caption cues <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+
+      <section id="review" class="review" aria-labelledby="review-title" hidden>
+        <div class="section-heading review-heading"><span class="step-number">02</span><div><h2 id="review-title">Review flagged cues</h2><p id="scan-summary">Scanning sampled frames…</p></div><button class="secondary-button" id="export-csv" type="button">Export CSV</button></div>
+        <div class="progress-wrap" id="progress-wrap" aria-live="polite"><div class="progress-label"><span id="progress-text">Preparing local scan</span><span id="progress-value">0%</span></div><progress id="scan-progress" max="100" value="0">0%</progress></div>
+        <div class="review-bench">
+          <div class="viewer-column">
+            <div class="video-stage" id="video-stage">
+              <video id="video" controls playsinline aria-label="Video preview"></video>
+              <canvas id="overlay" aria-hidden="true"></canvas>
+              <div class="caption-preview" id="caption-preview" aria-live="polite"></div>
+            </div>
+            <div class="viewer-tools">
+              <button class="quiet-button" id="mark-region" type="button" aria-pressed="false">Mark protected region</button>
+              <button class="quiet-button studio-only" id="save-preset" type="button" disabled title="Studio feature">Save regions · Studio</button>
+              <button class="quiet-button studio-only" id="export-json" type="button" disabled title="Studio feature">Export JSON · Studio</button>
+              <span id="region-help">Add an interpreter, slide, or sign that automation may miss.</span>
+            </div>
+            <div class="notice"><strong>Advisory check.</strong> Confirm every alert and watch the final video. This does not certify legal or WCAG compliance.</div>
+          </div>
+          <aside class="cue-panel" aria-label="Caption findings">
+            <div class="cue-toolbar"><div class="filter-group" role="group" aria-label="Filter findings"><button class="filter active" data-filter="open" type="button">Open <span id="open-count">0</span></button><button class="filter" data-filter="all" type="button">All <span id="all-count">0</span></button></div></div>
+            <ol id="findings" class="findings"></ol>
+            <div id="no-findings" class="empty-review" hidden><span aria-hidden="true">✓</span><h3>No overlaps found in sampled frames</h3><p>Still watch the full export—automated checks can miss motion, stylized text, and non-frontal faces.</p></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="studio-panel" aria-labelledby="studio-title">
+        <div><p class="eyebrow">Optional one-time unlock</p><h2 id="studio-title">Keep repeat productions consistent</h2><p>Studio adds reusable protected-region presets and JSON project reports. Core scanning, recommendations, and CSV export stay free.</p></div>
+        <div class="studio-actions"><span class="price">$19 <small>once</small></span><a class="primary-button" href="https://api.sociobot.in/api/v1/products/caption-placement-check/checkout" id="buy-link">Buy Studio</a><button class="text-button" id="restore-license" type="button">Restore a license</button></div>
+        <form id="license-form" class="license-form" hidden><label for="license-token">License token</label><div><input id="license-token" autocomplete="off" spellcheck="false" /><button class="secondary-button" type="submit">Verify license</button></div><p id="license-status" role="status"></p></form>
+      </section>
+    </main>
+    <footer class="app-footer"><span>Made for careful publishing.</span><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav></footer>
+    <script type="module" src="../src/app.ts"></script>
+  </body>
+</html>

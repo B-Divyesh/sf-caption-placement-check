@@ -1,0 +1,96 @@
+name: Release desktop apps
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            label: mac-arm64
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+            label: mac-x64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: windows-x64
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            label: linux-x64
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install Linux system packages
+        if: matrix.platform == 'ubuntu-22.04'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - run: npm ci
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Caption Placement Check ${{ github.ref_name }}
+          releaseBody: Local-first caption placement accessibility preflight. Builds are currently unsigned.
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }}
+      - name: Collect bundles
+        shell: bash
+        run: |
+          mkdir release-assets
+          find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.msi' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} release-assets/ \;
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.label }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  manifest:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Create checksums and release manifest
+        env:
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          cd artifacts
+          sha256sum * > SHA256SUMS
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          base = f"https://github.com/{os.environ['REPOSITORY']}/releases/download/{os.environ['VERSION']}"
+          platforms = {"mac": [], "windows": [], "linux": []}
+          for path in sorted(Path('.').iterdir()):
+              if not path.is_file() or path.name in {"SHA256SUMS", "latest.json"}: continue
+              suffix = path.name.lower()
+              platform = "mac" if suffix.endswith((".dmg", ".app.tar.gz")) else "windows" if suffix.endswith((".msi", ".exe")) else "linux"
+              platforms[platform].append({"name": path.name, "url": f"{base}/{path.name}", "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+          Path('latest.json').write_text(json.dumps({"version": os.environ['VERSION'], "platforms": platforms}, indent=2) + "\n")
+          PY
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            artifacts/SHA256SUMS
+            artifacts/latest.json

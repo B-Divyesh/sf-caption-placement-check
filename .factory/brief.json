@@ -1,0 +1,11 @@
+{
+  "slug": "caption-placement-check",
+  "title": "Caption Placement Check",
+  "territory": "utilities",
+  "user": "A solo educator, creator, or small organization publishing captioned video who needs to know when captions cover a speaker, slide, sign-language interpreter, or essential on-screen text.",
+  "smallest_useful_product": "A local drag-and-drop WebVTT/SRT plus video checker that samples frames, detects subtitle overlap with faces and dense text, and recommends safe zones or timed moves in a review list.",
+  "success_measure": "For a labeled 30-video test set, flag at least 85% of known critical caption-overlap intervals with fewer than three false alerts per 10-minute video.",
+  "artifact_class": "desktop-app",
+  "monetization": "one-time",
+  "constraints": "Run media locally; do not claim legal WCAG compliance; face/text detection must be advisory and be tested across non-Latin scripts."
+}
