@@ -31,6 +31,8 @@ Completed 2026-08-28:
 - `sh -n public/install.sh` passed; `npm audit --omit=dev` reported 0 vulnerabilities.
 - Live failure reproduction before this deployment: `curl -I https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest/download/latest.json` returned a GitHub `302` redirect with no `Access-Control-Allow-Origin`; `curl -I https://api.github.com/repos/B-Divyesh/sf-caption-placement-check/releases/latest` returned `200` with `access-control-allow-origin: *`.
 - Built sizes: landing JavaScript 3.28 KB and CSS 21.04 KB uncompressed; checker/demo JavaScript 16.28 KB and CSS 12.49 KB; shipped sample video 1.7 KB; hero WebP 23.02 KB.
+- Deployed with `swa deploy dist/site --env production --resource-group sociobot --app-name sf-caption-placement-check --no-use-keychain` after pushing commit `fea74e1`.
+- Live verification after deployment: the landing page returned the updated plain-words title, one `h1`, `lang="en"`, a `main` landmark, CSP/security headers, a GitHub release asset URL, and no browser console/page errors. The live `/demo/` page displayed its no-save banner and completed `2 cues sampled` with no browser console/page errors.
 
 ## What was built
 
