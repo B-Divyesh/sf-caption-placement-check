@@ -79,7 +79,7 @@ test("@claim:offline-demo reloads the shipped demo after its first visit", async
   await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
   await expect.poll(() => page.locator("html").getAttribute("data-offline-ready")).toBe("true");
   expect(await page.evaluate(async () => {
-    const cache = await caches.open("caption-placement-check-v6");
+    const cache = await caches.open("caption-placement-check-v7");
     const assets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
       .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
     return Promise.all(assets.map(async (asset) => Boolean(await cache.match(asset))));
@@ -154,4 +154,89 @@ test("@claim:local-scan exports the demo review as a complete CSV", async ({ pag
   expect(result.suggestedFilename()).toBe("caption-placement-findings.csv");
   expect(content.split("\n")).toHaveLength(3);
   expect(content).toContain("start,end,reason,confidence_percent,caption,recommendation,status");
+});
+
+test("@claim:caption-formats scans SRT and positioned WebVTT", async ({ page }) => {
+  for (const captions of ["tests/fixtures/sample.srt", "tests/fixtures/sample.vtt"]) {
+    await page.goto("/check/");
+    await page.locator("#video-file").setInputFiles(resolve("tests/fixtures/sample.webm"));
+    await page.locator("#caption-file").setInputFiles(resolve(captions));
+    await page.getByRole("button", { name: /Scan caption cues/ }).click();
+    await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
+  }
+});
+
+test("@claim:local-detection flags shipped portrait and dense-media overlap fixtures", async ({ page }) => {
+  for (const media of ["cpc-01.webm", "cpc-13.webm"]) {
+    await page.goto("/check/");
+    await page.locator("#video-file").setInputFiles(resolve("tests/benchmark/media", media));
+    await page.locator("#caption-file").setInputFiles(resolve("tests/benchmark/critical.srt"));
+    await page.getByRole("button", { name: /Scan caption cues/ }).click();
+    await expect(page.locator("#findings li")).toHaveCount(1, { timeout: 20_000 });
+  }
+});
+
+test("@claim:safe-zone-recommendations shows a move recommendation for every sample alert", async ({ page }) => {
+  await page.goto("/demo/");
+  await expect(page.locator("#findings li")).toHaveCount(2, { timeout: 15_000 });
+  await expect(page.locator(".recommendation")).toHaveCount(2);
+  await expect(page.locator(".recommendation").first()).toContainText(/Move/);
+});
+
+test("@claim:manual-regions adds a protected region from the keyboard", async ({ page }) => {
+  await page.goto("/check/");
+  await page.locator("#video-file").setInputFiles(resolve("tests/fixtures/sample.webm"));
+  await page.locator("#caption-file").setInputFiles(resolve("tests/fixtures/sample.srt"));
+  await page.getByRole("button", { name: /Scan caption cues/ }).click();
+  await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
+  const before = await page.locator("#findings li").count();
+  await page.getByRole("button", { name: "Mark protected region" }).click();
+  await page.keyboard.press("Enter");
+  await expect.poll(() => page.locator("#findings li").count()).toBeGreaterThanOrEqual(before);
+  await expect(page.getByText("Protected region added.")).toBeVisible();
+});
+
+test("@claim:json-project-report exports after a valid Studio license response", async ({ page }) => {
+  await page.route("**/api/v1/products/caption-placement-check/verify?license=valid-studio-token", async (route) => {
+    await route.fulfill({ contentType: "application/json", body: JSON.stringify({ valid: true, reason: "ok" }) });
+  });
+  await page.goto("/check/?license=valid-studio-token");
+  await page.locator("#video-file").setInputFiles(resolve("tests/fixtures/sample.webm"));
+  await page.locator("#caption-file").setInputFiles(resolve("tests/fixtures/sample.srt"));
+  await page.getByRole("button", { name: /Scan caption cues/ }).click();
+  await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
+  await expect(page.getByRole("button", { name: "Export JSON · Studio" })).toBeEnabled();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export JSON · Studio" }).click();
+  const report = await download;
+  expect(report.suggestedFilename()).toBe("caption-placement-project.json");
+  const stream = await report.createReadStream();
+  let content = "";
+  for await (const chunk of stream!) content += chunk;
+  expect(JSON.parse(content)).toMatchObject({ schema: 1 });
+});
+
+test("@claim:desktop-downloads offers all desktop platforms and checksum guidance", async ({ page }) => {
+  await page.goto("/");
+  for (const platform of ["macOS", "Windows", "Linux"]) {
+    await expect(page.getByRole("link", { name: platform, exact: true })).toHaveAttribute("href", /releases/);
+  }
+  await expect(page.locator("#release-status")).toContainText(/Release links resolve|checksums/i);
+});
+
+test("native first-run equivalent exposes the shipped sample action", async ({ page }) => {
+  await page.goto("/check/");
+  await page.getByRole("button", { name: "Load sample project" }).click();
+  await expect(page.locator("#scan-summary")).toContainText("2 cues sampled · 2 cues need a closer look", { timeout: 15_000 });
+});
+
+test("404 keeps contrast and social metadata on desktop and mobile", async ({ page }) => {
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/404.html");
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.filter((issue) => ["serious", "critical"].includes(issue.impact || ""))).toEqual([]);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Page not found/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /404/);
+  }
 });

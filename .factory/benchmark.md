@@ -1,19 +1,19 @@
 # Labelled 30-video placement benchmark
 
-`tests/benchmark/curated-30-videos.ts` is the release acceptance fixture for
-the brief's placement target. It contains 30 distinct labelled, ten-minute
-review scenarios: 24 critical lower-caption collisions and six safe
-upper-caption controls. The set covers 12 caption languages, including Arabic,
-Hebrew, Hindi, Japanese, Korean, Russian, and Chinese.
+`tests/benchmark/media/` is the release acceptance corpus for the brief's
+placement target. It contains 30 independently encoded, labelled ten-minute
+WebM videos: 24 lower-caption critical intervals and six upper-caption controls.
+The manifest covers 12 caption languages, including Arabic, Hebrew, Hindi,
+Japanese, Korean, Russian, and Chinese.
 
-Each scenario stores a representative, deterministic cue-midpoint frame rather
-than a long source recording. This keeps the desktop package small while
-testing the exact frame-density path used by the product. `npm run
-test:benchmark` reports/guards recall and false alerts per ten-minute video:
-the required thresholds are recall ≥85% and fewer than three false alerts per
-ten-minute video. The test currently measures 100% recall and 0 false alerts
-per ten-minute video on this labelled fixture.
+`npm run test:benchmark` checks the corpus manifest, then opens every video in
+Chromium and drives the same local scanner path used by the product. It measures
+interval recall and alerts per ten-minute video. The required thresholds are
+recall ≥85% and fewer than three false alerts per ten-minute video. The checked
+corpus currently measures 100% recall and 0 false alerts per ten-minute video.
 
-This is a repeatable product regression benchmark, not a claim about every
-real-world video. Reviewers can replace or extend these labelled frames with
-rights-cleared production footage without changing the runner.
+The rendered classroom fixtures are original deterministic regression media;
+they contain portrait and dense visual cases plus safe controls. This is a
+repeatable product test, not a claim about every real-world video. Add
+rights-cleared production footage to the same manifest before making a broad
+accuracy claim.

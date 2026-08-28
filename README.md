@@ -12,10 +12,10 @@ Try the isolated sample review in one click: <https://caption-placement-check.so
 
 - Processes video and caption files in local app memory.
 - Parses SRT and WebVTT, including cue position settings and non-Latin text.
-- Uses an available platform face detector and a visual-density heuristic as advisory signals.
+- Uses an available platform face detector, a conservative local fallback, and a visual-density heuristic as advisory signals.
 - Lets a reviewer draw protected regions for interpreters, slides, signs, or other meaningful content.
 - Exports the review list as CSV for free.
-- Saves protected-region presets in the browser when you choose, and exports JSON project reports.
+- Saves protected-region presets in the browser when you choose. Studio exports JSON project reports for a $19 one-time license.
 
 ## Run locally
 
@@ -60,8 +60,12 @@ Early desktop builds are unsigned. On macOS, right-click the app and choose **Op
 
 The app has no telemetry or advertising analytics and uses no runtime CDN resources. Chosen media is processed locally. Saved protected regions stay in browser storage until you clear site data; demo mode saves nothing. See [`site/privacy/index.html`](site/privacy/index.html) and [`site/terms/index.html`](site/terms/index.html).
 
+## Studio license
+
+The scanner, recommendations, manual regions, saved regions, and CSV export are free. Studio is a $19 one-time license for JSON project reports. Checkout and license verification use Sociobot/Dodo. A license token is stored only in browser storage and checked at most once daily; the free checker never waits for that check. Use **Restore a license** in the checker to move Studio to another device.
+
 ## Benchmark
 
-Run `npm run test:benchmark` for the labelled 30-video placement regression fixture. It checks the brief target against deterministic representative frames without making a public accuracy promise. See [`.factory/benchmark.md`](.factory/benchmark.md).
+Run `npm run test:benchmark` for the labelled 30-video placement regression corpus. It decodes each shipped ten-minute WebM fixture through the browser scanner and guards the brief threshold without making a public accuracy promise. See [`.factory/benchmark.md`](.factory/benchmark.md).
 
 The visual rationale, asset prompt, and provenance are documented in [`.factory/design.md`](.factory/design.md). The software is MIT licensed.

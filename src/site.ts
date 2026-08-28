@@ -63,4 +63,4 @@ document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => 
   } catch { button.textContent = "Select the command to copy"; }
 }));
 
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js?revision=3").catch(() => undefined));
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => undefined));

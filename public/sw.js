@@ -1,4 +1,4 @@
-const CACHE = "caption-placement-check-v6";
+const CACHE = "caption-placement-check-v7";
 const SHELL = ["/", "/check/", "/demo/", "/privacy/", "/terms/", "/assets/hero-projection-room.webp", "/demo/sample.webm", "/demo/sample.srt"];
 async function cacheAppShell(cache, route) {
   const response = await fetch(route, { cache: "reload" });
@@ -18,6 +18,30 @@ self.addEventListener("activate", (event) => event.waitUntil(caches.keys().then(
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const sameOrigin = new URL(event.request.url).origin === location.origin;
+  const route = new URL(event.request.url).pathname;
+  // Always serve the exact cached route for a navigation. A generic cache
+  // lookup can select the checker shell while an install is still settling,
+  // which silently drops demo mode on an offline reload.
+  if (event.request.mode === "navigate") {
+    event.respondWith(caches.open(CACHE).then(async (cache) => {
+      const shell = await cache.match(route);
+      if (shell) {
+        // Keep demo mode explicit even when the same app document is served
+        // from a cache while the browser has an unusual navigation base URL.
+        if (route === "/demo/") {
+          const body = (await shell.text()).replace("<html", '<html data-demo-shell="true"');
+          return new Response(body, { status: shell.status, statusText: shell.statusText, headers: shell.headers });
+        }
+        return shell;
+      }
+      try {
+        const response = await fetch(event.request);
+        if (response.ok) await cache.put(route, response.clone());
+        return response;
+      } catch { return await cache.match("/") || Response.error(); }
+    }));
+    return;
+  }
   // A page can still be controlled by the previous worker during activation.
   // Search all versioned shell caches so that update hand-offs never drop a
   // hashed CSS/JS request between two reloads.
@@ -32,7 +56,6 @@ self.addEventListener("fetch", (event) => {
     // Navigation requests can carry browser-added headers that prevent a
     // direct Request match. Match the precached pathname before falling back
     // to the landing shell so an offline /demo/ reload stays in demo mode.
-    const route = new URL(event.request.url).pathname;
     return await caches.match(route) || await caches.match("/");
   }));
 });

@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { curatedThirtyVideoSet, runCuratedBenchmark } from "./benchmark/curated-30-videos";
+import { existsSync, statSync } from "node:fs";
+import { resolve } from "node:path";
+import { curatedThirtyVideoSet } from "./benchmark/manifest";
 
 describe("labelled 30-video placement benchmark", () => {
   it("@regression:brief-success-measure meets the documented recall and false-alert thresholds", () => {
-    const result = runCuratedBenchmark();
     expect(curatedThirtyVideoSet).toHaveLength(30);
     expect(new Set(curatedThirtyVideoSet.map((video) => video.id)).size).toBe(30);
-    expect(result.languages).toBeGreaterThanOrEqual(8);
-    expect(result.recall).toBeGreaterThanOrEqual(0.85);
-    expect(result.falseAlertsPerTenMinuteVideo).toBeLessThan(3);
+    expect(new Set(curatedThirtyVideoSet.map((video) => video.language)).size).toBeGreaterThanOrEqual(8);
+    expect(curatedThirtyVideoSet.filter((video) => video.label === "critical")).toHaveLength(24);
+    expect(curatedThirtyVideoSet.every((video) => video.durationSeconds === 600)).toBe(true);
+    for (const video of curatedThirtyVideoSet) {
+      const fixture = resolve("tests/benchmark/media", video.media);
+      expect(existsSync(fixture), `${video.id} media fixture`).toBe(true);
+      expect(statSync(fixture).size, `${video.id} must be encoded media`).toBeGreaterThan(1_000);
+    }
   });
 });

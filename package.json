@@ -11,7 +11,7 @@
     "build:site": "vite build --config vite.config.ts && vite build --config vite.app.config.ts && mkdir -p dist/site/check dist/site/demo && cp -R dist/app/. dist/site/check/ && cp -R dist/app/. dist/site/demo/",
     "build:app": "vite build --config vite.app.config.ts",
     "test": "vitest run",
-    "test:benchmark": "vitest run tests/benchmark.test.ts",
+    "test:benchmark": "vitest run tests/benchmark.test.ts && playwright test tests/e2e/benchmark.spec.ts",
     "test:e2e": "playwright test",
     "check": "tsc --noEmit && cargo check --manifest-path src-tauri/Cargo.toml"
   },

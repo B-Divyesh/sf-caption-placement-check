@@ -47,5 +47,47 @@
     "where": "README and browser checker",
     "test": "npm run test:e2e -- --grep @claim:local-scan",
     "sandbox": "fresh browser context opens /demo/, completes its shipped sample scan, downloads CSV, and asserts its header plus two finding rows"
+  },
+  {
+    "id": "caption-formats",
+    "claim": "Reads SRT and WebVTT captions, including positioned cues",
+    "where": "landing page, checker setup, README",
+    "test": "npm run test:e2e -- --grep @claim:caption-formats",
+    "sandbox": "fresh browser context scans the shipped video once with SRT and once with WebVTT line settings"
+  },
+  {
+    "id": "local-detection",
+    "claim": "Flags possible face and dense visual overlap on this device",
+    "where": "landing page, README",
+    "test": "npm run test:e2e -- --grep @claim:local-detection",
+    "sandbox": "fresh browser context scans shipped labelled portrait and dense-media fixtures and sees an advisory finding for each"
+  },
+  {
+    "id": "safe-zone-recommendations",
+    "claim": "Shows a safer caption position with each alert",
+    "where": "landing page, demo review",
+    "test": "npm run test:e2e -- --grep @claim:safe-zone-recommendations",
+    "sandbox": "fresh browser context opens /demo/ and asserts each supplied finding has a visible move recommendation"
+  },
+  {
+    "id": "manual-regions",
+    "claim": "Lets you mark protected regions with mouse or keyboard",
+    "where": "landing page, checker review",
+    "test": "npm run test:e2e -- --grep @claim:manual-regions",
+    "sandbox": "fresh browser context scans shipped local files, focuses the overlay, adds a keyboard region, and observes the finding count"
+  },
+  {
+    "id": "json-project-report",
+    "claim": "Studio exports a JSON project report after a valid one-time license check",
+    "where": "Studio section, checker",
+    "test": "npm run test:e2e -- --grep @claim:json-project-report",
+    "sandbox": "fresh browser context stubs a valid Sociobot license response, scans shipped local files, and downloads a readable JSON report"
+  },
+  {
+    "id": "desktop-downloads",
+    "claim": "Offers macOS, Windows, and Linux desktop downloads with published checksums",
+    "where": "download section, README",
+    "test": "npm run test:e2e -- --grep @claim:desktop-downloads",
+    "sandbox": "fresh browser context checks each platform link and the checksum status message from the shipped landing page"
   }
 ]

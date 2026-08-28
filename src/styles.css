@@ -31,7 +31,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .demo-banner { display: flex; position: sticky; z-index: 20; top: 0; min-height: 44px; align-items: center; justify-content: center; gap: 12px 20px; padding: 8px 24px; background: var(--projector); color: var(--ink); font-size: 14px; }
 .demo-banner strong { font-family: var(--display); letter-spacing: .02em; }.demo-banner button, .demo-banner a { min-height: 32px; padding: 3px 8px; border: 1px solid currentColor; background: transparent; color: inherit; font-weight: 750; }.demo-banner a { display: inline-flex; align-items: center; text-decoration: none; }
 [hidden] { display: none !important; }
-.brand { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; text-decoration: none; font-family: var(--display); font-weight: 800; letter-spacing: .03em; }
+.brand { display: inline-flex; min-width: 44px; align-items: center; gap: 12px; min-height: 44px; text-decoration: none; font-family: var(--display); font-weight: 800; letter-spacing: .03em; }
 .brand-mark { position: relative; width: 28px; height: 22px; border: 2px solid var(--projector); border-left-color: transparent; border-right-color: transparent; }
 .brand-mark::before, .brand-mark::after { content: ""; position: absolute; top: 3px; width: 7px; height: 12px; border-block: 2px solid var(--projector); }
 .brand-mark::before { left: -1px; border-left: 2px solid var(--projector); }
@@ -40,10 +40,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .app-header { min-height: 72px; border-bottom: 1px solid var(--line); }
 .app-footer { min-height: 88px; margin-top: 64px; border-top: 1px solid var(--line); color: var(--mist); }
 .app-footer nav { display: flex; gap: 24px; }
+.app-footer nav a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; }
 .local-badge { display: inline-flex; align-items: center; gap: 8px; color: var(--mist); font-size: 14px; }
 .local-badge span { color: var(--signal); }
 .workspace { width: min(1480px, calc(100% - 48px)); margin-inline: auto; }
 .workspace-intro { display: flex; align-items: end; justify-content: space-between; gap: 32px; padding: 56px 0 40px; }
+.first-run-note { max-width: 620px; margin: 16px 0 0; color: var(--mist); }
 h1, h2, h3, p { margin-top: 0; }
 h1, h2, h3 { font-family: var(--display); line-height: 1.05; }
 h1 { max-width: 750px; margin-bottom: 0; font-size: clamp(2.3rem, 5vw, 4rem); letter-spacing: -.025em; }
@@ -69,6 +71,7 @@ h3 { font-size: 1.25rem; }
 .caption-icon::before, .caption-icon::after { content: ""; position: absolute; height: 3px; background: var(--mist); bottom: 11px; }
 .caption-icon::before { left: 7px; width: 14px; }.caption-icon::after { right: 7px; width: 12px; }
 .setup-actions { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-top: 24px; }
+.setup-buttons { display: flex; flex-wrap: wrap; justify-content: end; gap: 12px; }
 .placement-select { display: grid; gap: 6px; color: var(--mist); font-size: 14px; }
 select, input { min-height: 44px; border: 1px solid var(--line); border-radius: 0; background: var(--ink); color: var(--paper); padding: 0 12px; }
 .primary-button, .secondary-button, .quiet-button, .text-button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 24px; border: 0; cursor: pointer; text-decoration: none; font-weight: 750; }
@@ -144,7 +147,7 @@ progress::-webkit-progress-bar { background: var(--raised); } progress::-webkit-
   .app-header { min-height: 64px; }.brand > span:last-child { display: none; }.local-badge { max-width: 220px; text-align: right; }
   .workspace-intro { align-items: start; padding: 40px 0 28px; }.workspace-intro .quiet-button { display: none; }
   .setup { padding: 20px 16px; }.file-grid { grid-template-columns: 1fr; }.drop-aperture { min-height: 150px; }
-  .setup-actions { align-items: stretch; flex-direction: column; }.setup-actions .primary-button { width: 100%; }
+  .setup-actions { align-items: stretch; flex-direction: column; }.setup-buttons { display: grid; grid-template-columns: 1fr; }.setup-actions .primary-button, .setup-actions .quiet-button { width: 100%; }
   .section-heading, .review-heading { grid-template-columns: 40px minmax(0, 1fr); }.review-heading .secondary-button { grid-column: 1 / -1; width: 100%; }
   .step-number { width: 36px; height: 36px; }
   .review { padding-top: 56px; }.video-stage { min-height: 220px; margin-inline: -16px; }.viewer-tools { align-items: stretch; flex-direction: column; padding: 12px 0; }.viewer-tools .quiet-button { width: 100%; }
