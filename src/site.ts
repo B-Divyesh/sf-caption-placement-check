@@ -17,7 +17,8 @@ if (download) download.textContent = `Download for ${names[platform]}`;
 
 function firstAsset(value?: Asset | Asset[]) { return Array.isArray(value) ? value[0] : value; }
 
-if (download && status) fetch(manifestUrl, { cache: "no-cache" }).then(async (response) => {
+const isProduction = location.hostname === "caption-placement-check.sociobot.in";
+if (download && status && isProduction) fetch(manifestUrl, { cache: "no-cache" }).then(async (response) => {
   if (!response.ok) throw new Error("No release manifest");
   const manifest = await response.json() as Manifest;
   const asset = firstAsset(manifest.platforms[platform]);
@@ -30,6 +31,7 @@ if (download && status) fetch(manifestUrl, { cache: "no-cache" }).then(async (re
 }).catch(() => {
   status.textContent = "The first signed-off build is being prepared. The browser checker is available now.";
 });
+else if (status) status.textContent = "Release links resolve on the production site. The browser checker is available now.";
 
 if (isWindows) document.querySelector("#install-command")!.textContent = "irm https://caption-placement-check.sociobot.in/install.ps1 | iex";
 document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => button.addEventListener("click", async () => {

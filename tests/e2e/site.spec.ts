@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { resolve } from "node:path";
 
 test("landing is accessible and routes to the checker", async ({ page }) => {
   await page.goto("/");
@@ -26,4 +27,14 @@ test("mobile layout keeps primary actions visible", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: /Download for/ }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Try the browser checker" })).toBeVisible();
+});
+
+test("runs a local video and caption scan end to end", async ({ page }) => {
+  await page.goto("/check/");
+  await page.locator("#video-file").setInputFiles(resolve("tests/fixtures/sample.webm"));
+  await page.locator("#caption-file").setInputFiles(resolve("tests/fixtures/sample.srt"));
+  await expect(page.getByRole("button", { name: /Scan caption cues/ })).toBeEnabled();
+  await page.getByRole("button", { name: /Scan caption cues/ }).click();
+  await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
+  await expect(page.getByRole("button", { name: "Export CSV" })).toBeVisible();
 });

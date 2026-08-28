@@ -4,9 +4,17 @@ on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag
+        required: true
+        default: v0.1.0
 
 permissions:
   contents: write
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
 
 jobs:
   build:
@@ -44,8 +52,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: Caption Placement Check ${{ github.ref_name }}
+          tagName: ${{ env.RELEASE_TAG }}
+          releaseName: Caption Placement Check ${{ env.RELEASE_TAG }}
           releaseBody: Local-first caption placement accessibility preflight. Builds are currently unsigned.
           releaseDraft: false
           prerelease: false
@@ -54,7 +62,7 @@ jobs:
         shell: bash
         run: |
           mkdir release-assets
-          find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.msi' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} release-assets/ \;
+          find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.msi' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -exec cp {} release-assets/ \;
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.label }}
@@ -72,7 +80,7 @@ jobs:
       - name: Create checksums and release manifest
         env:
           REPOSITORY: ${{ github.repository }}
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ env.RELEASE_TAG }}
         run: |
           cd artifacts
           sha256sum * > SHA256SUMS
@@ -90,7 +98,7 @@ jobs:
           PY
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
           files: |
             artifacts/SHA256SUMS
             artifacts/latest.json

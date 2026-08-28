@@ -36,8 +36,10 @@ function setError(message = "") {
 
 function setFile(kind: "video" | "caption", file?: File) {
   if (!file) return;
-  const expected = kind === "video" ? /^(video\/|.*\.(mp4|webm|mov|m4v)$)/i : /\.(srt|vtt)$/i;
-  if (!expected.test(file.type || file.name)) {
+  const valid = kind === "video"
+    ? file.type.startsWith("video/") || /\.(mp4|webm|mov|m4v)$/i.test(file.name)
+    : ["text/vtt", "application/x-subrip"].includes(file.type) || /\.(srt|vtt)$/i.test(file.name);
+  if (!valid) {
     setError(kind === "video" ? "That does not look like a supported video. Choose MP4, WebM, MOV, or M4V." : "Choose an SRT or WebVTT caption file.");
     return;
   }
