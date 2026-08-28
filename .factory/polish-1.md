@@ -9,7 +9,7 @@ Polished candidate `bf01fb6c6b8aec98a368a5c6522bf406d7dbeef9` against every find
 | F-1-1 | Removed the unavailable Studio offer, checkout link, paywall, and license flow. JSON reports are free. | `free feature wording agrees across the landing page, checker, and terms`; `@claim:no-account`; [mobile first screen](evidence/first-screen-mobile.png); live `/` and `/demo/?demo=1` contain no purchase control. |
 | F-1-2 | Removed every license read and verification request. Demo uses no storage namespace because it persists nothing. Reset reloads only shipped sample files. | `@claim:demo-isolation` seeds every former real key, spies on reads, edits, resets, and asserts unchanged values plus same-origin traffic; [populated demo](evidence/demo-review-desktop.png); cold live demo produced no external request. |
 | F-1-3 | Made scanning, regions, recommendations, CSV, and JSON consistently free across the site, checker, README, and Terms. | `free feature wording agrees across the landing page, checker, and terms`; `@claim:no-account`; live `/terms/`. |
-| F-1-4 | Attached the `seeked` listener before changing playback time and waits for decoded animation frames before pixel sampling. | `@claim:local-detection`; full browser suite repeated twice: 46/46; benchmark: 30 videos; clean live demo: two alerts online and offline. |
+| F-1-4 | Attached the `seeked` listener before changing playback time and waits for decoded animation frames before pixel sampling. | `@claim:local-detection`; full browser suite repeated twice: 48/48; benchmark: 30 videos; clean live demo: two alerts online and offline. |
 | F-1-5 | Removed “script-agnostic” marketing copy and shipped Arabic and Japanese demo captions. | `@claim:unicode-captions` checks rendered alerts and CSV bytes; [populated demo](evidence/demo-review-desktop.png); live `/demo/?demo=1`. |
 | F-1-6 | Replaced the unproved desktop-offline promise with the precise browser-demo statement. | `@claim:offline-demo`; cold live online-to-offline reload retained the banner and two alerts. |
 | F-1-7 | Added the release-cache claim and a controlled-clock request-count test. | `@claim:release-cache`. |
@@ -40,14 +40,14 @@ Polished candidate `bf01fb6c6b8aec98a368a5c6522bf406d7dbeef9` against every find
 
 - Clean clone: all 22 exact commands from `.factory/claims.json` passed.
 - Unit and integration tests: 16/16 passed.
-- Browser tests: 23/23 passed, then 46/46 with `--repeat-each=2`. The added pricing-consistency regression also passes.
+- Browser tests: 24/24 passed, then 48/48 with `--repeat-each=2`.
 - Build: `npm run build` produced `dist/site` and the Tauri web bundle.
 - TypeScript and Rust: `npm run check` passed after installing the documented Linux Tauri packages.
 - Accessibility: all six live routes passed Axe at 390 × 844 and 1440 × 900 with no serious or critical issue.
 - Live structure: all routes have `lang`, one `h1`, `main`, route titles, shared navigation/footer, focus arrival, no overflow, and no console error.
 - Privacy: seeded demo storage remained unread and unchanged; the demo made no third-party request.
 - Offline: a cold live demo reload retained its title, banner, summary, and two alerts.
-- Performance: Lighthouse mobile scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO. LCP was 1.1 seconds, CLS 0, and TBT 0 ms.
+- Performance: Lighthouse mobile scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO. LCP was 900 ms, CLS 0, and TBT 62 ms.
 - Deployment: <https://caption-placement-check.sociobot.in>
 
 There are no unresolved review findings.

@@ -1,0 +1,41 @@
+{
+  "commit": "1ac7fc138bfe03cdb7730360f6f007ba23ceabb3",
+  "url": "https://caption-placement-check.sociobot.in",
+  "routes": ["/", "/demo/?demo=1", "/check/", "/privacy/", "/terms/", "/404.html"],
+  "routeChecks": {
+    "titles": true,
+    "oneH1": true,
+    "main": true,
+    "sharedNavigation": true,
+    "mobileOverflow": false,
+    "consoleErrors": 0,
+    "seriousOrCriticalAxeViolations": 0,
+    "networkOrigins": ["https://caption-placement-check.sociobot.in", "https://api.github.com"]
+  },
+  "demoIsolation": {
+    "protectedStorageReads": [],
+    "protectedStorageUnchanged": true,
+    "externalRequests": [],
+    "alertsAfterReset": 2
+  },
+  "offlineDemo": {
+    "title": "Demo — Caption Placement Check",
+    "summary": "2 captions checked · 2 alerts need review",
+    "alerts": 2
+  },
+  "commercialAnd404": {
+    "paidControls": 0,
+    "jsonExportEnabled": true,
+    "termsAgree": true,
+    "unknownRouteStatus": 404
+  },
+  "lighthouseMobile": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100,
+    "lcpMs": 900.2,
+    "cls": 0,
+    "tbtMs": 62
+  }
+}

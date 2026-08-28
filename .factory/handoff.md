@@ -2,7 +2,7 @@
 
 ## Result
 
-All 29 findings in `.factory/review-1.md` are resolved. There were no earlier review or polish reports. The repaired static site is live at <https://caption-placement-check.sociobot.in>, and desktop release `v0.1.4` was built from repair commit `1647fea2ea7288c6c53d81dc939603f7e18da3da`.
+All 29 findings in `.factory/review-1.md` are resolved. There were no earlier review or polish reports. Repair validation and the static deployment were pushed at `1ac7fc138bfe03cdb7730360f6f007ba23ceabb3`; the existing desktop release `v0.1.4` was built from the preceding application repair commit `1647fea2ea7288c6c53d81dc939603f7e18da3da`.
 
 The unavailable paid offer was removed because the repository cannot register billing infrastructure. JSON project reports are now free. The site makes no checkout or license request and does not advertise a paid tier.
 
@@ -38,19 +38,19 @@ Recorded results on 2026-08-28:
 
 - Every exact command in `.factory/claims.json`: 22/22 passed from a clean clone.
 - Unit/integration: 16/16 passed.
-- Browser: 23/23 passed; repeated full suite: 46/46 passed. The later pricing-consistency regression passed separately.
+- Browser: 24/24 passed; repeated full suite: 48/48 passed.
 - Benchmark: 30/30 labelled videos passed.
 - Build: passed; `dist/site` and the Tauri web bundle were produced.
 - TypeScript and Rust: passed. The documented Linux Tauri packages were installed before `cargo check`.
 - Dependency audit: zero vulnerabilities.
 - Installer syntax checks: passed.
 - Local verifier: `.factory/evidence/verify-final-local/verify.json` reports correct title, `lang`, one `h1`, `main`, alt text, labels, and zero console errors.
-- Live verifier: root loaded in 786 ms and demo in 793 ms; both had zero console errors.
+- Live verifier: root loaded in 1,185 ms and demo in 2,750 ms; both had zero console errors. See `.factory/evidence/polish-1-live-audit.json`.
 - Live Axe: six routes at 390 × 844 and 1440 × 900 had no serious or critical violations.
 - Live route audit: no horizontal overflow; route-specific titles, focus, shared navigation/footer, icon metadata, and 404 status all passed.
 - Live privacy audit: seeded storage was unread and unchanged; demo traffic stayed same-origin.
 - Live offline audit: the demo reloaded with its banner, two-caption summary, and two alerts.
-- Lighthouse mobile: performance 100, accessibility 100, best practices 100, SEO 100; LCP 1.1 s, CLS 0, TBT 0 ms.
+- Lighthouse mobile: performance 100, accessibility 100, best practices 100, SEO 100; LCP 900 ms, CLS 0, TBT 62 ms.
 
 Visual evidence is under `.factory/evidence/`. The finding-by-finding matrix is `.factory/polish-1.md`.
 
