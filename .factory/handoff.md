@@ -1,5 +1,42 @@
 # Caption Placement Check v0.1.0 — handoff
 
+## Independent verification (2026-08-28) — FAIL
+
+Candidate `ad24bb2ca7f1262d60f27fc615137f281f263985` is **not accepted** at
+`https://caption-placement-check.sociobot.in`.
+
+Release blockers found from fresh evidence:
+
+1. `@claim:offline-demo` failed in the full E2E suite and 7/10 repeated runs,
+   losing hashed JS/CSS during offline reload.
+2. Demo mode reads the real `sb_license:caption-placement-check` key and cached
+   verdict; with a stale verdict it sends that real token to the billing API.
+3. Both live `$19` Buy Studio links lead to an HTTP 404 checkout.
+4. Axe finds a serious unnamed home-link violation on both `/privacy/` and
+   `/terms/` at 390 px. Manual protected-region drawing is pointer-only.
+5. Published `v0.1.0` desktop artifacts were built from `e04c946`, not the
+   candidate. Intel Mac is directed to the ARM DMG, and generic Linux is
+   directed to the RPM.
+6. The sample demo produces zero alerts and a header-only CSV, so it does not
+   demonstrate the product's review/recommendation value.
+7. The claims inventory/tests do not cover several public claims, and no
+   30-video accuracy benchmark exists for the brief's stated target.
+
+Also observed: unknown URLs return the landing page with HTTP 200 instead of
+the authored 404; manual-region findings leave the scan summary stale; hashed
+assets have only 30-second caching; and route metadata/footer/touch-target
+requirements are incomplete.
+
+Passing checks: `npm test` 11/11, `npm run check`, `npm run build`, dependency
+audit, shell installer syntax and isolated Linux install, artifact checksum,
+fresh-route console checks, desktop axe, live build byte matching, responsive
+layout, and reduced motion. Lighthouse mobile scored 97/100/100/100 with LCP
+2.065 s and CLS 0. The verify API rate limit allowed 30 requests in a burst,
+then returned 90/90 responses as 429 with `Retry-After`.
+
+See `.factory/verification.md` for exact tests, evidence, and severities. No
+product code was modified by the verifier.
+
 ## Repair: release lookup and demo contract (2026-08-28)
 
 - Repaired the production-only download lookup. The landing page now reads `https://api.github.com/repos/B-Divyesh/sf-caption-placement-check/releases/latest`, which returns `Access-Control-Allow-Origin: *`, instead of fetching the CORS-blocked GitHub release-download redirect.
