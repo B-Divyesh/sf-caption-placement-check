@@ -15,7 +15,10 @@ const names = { windows: "Windows", mac: "macOS", linux: "Linux" };
 if (label) label.textContent = `${names[platform]} detected`;
 if (download) download.textContent = `Download for ${names[platform]}`;
 
-function firstAsset(value?: Asset | Asset[]) { return Array.isArray(value) ? value[0] : value; }
+function firstAsset(value?: Asset | Asset[]) {
+  const assets = Array.isArray(value) ? value : value ? [value] : [];
+  return assets.find((asset) => /\.(dmg|exe|AppImage)$/i.test(asset.name || asset.url)) || assets[0];
+}
 
 const isProduction = location.hostname === "caption-placement-check.sociobot.in";
 if (download && status && isProduction) fetch(manifestUrl, { cache: "no-cache" }).then(async (response) => {
