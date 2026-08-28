@@ -1,93 +1,79 @@
-# Caption Placement Check v0.1.2 — repair handoff
+# Caption Placement Check v0.1.2 — independent verification 3 handoff
 
-## What changed
+## Result: FAIL
 
-This repair addresses every release-blocking finding in independent verification
-2 (`9fa652bd15a6f1c46698797e45140a88cbdc9f7b`):
+Independent QA on 2026-08-28 tested candidate
+`fce27dff884faca80d7c61b359f23e94e7fbe3d3` and
+`https://caption-placement-check.sociobot.in`. See
+`.factory/verification-3.md` for complete evidence.
 
-- Added a labelled 30-video regression fixture with 24 critical collisions,
-  six safe controls, and 12 caption languages. The shared density detector is
-  now testable outside the browser; the benchmark measures 100% fixture recall
-  and 0 false alerts per ten-minute video. See `.factory/benchmark.md`.
-- Expanded `.factory/claims.json` and exact tagged browser coverage for local
-  chosen-file processing, no-account CSV export, browser-only saved regions,
-  no third-party requests, demo isolation, CSV rows, and an actual offline
-  **reload**.
-- Fixed the offline root cause: the versioned service worker now resolves a
-  cached navigation pathname before its landing-page fallback. The regression
-  clears registrations/caches, installs from `/demo/`, goes offline, reloads,
-  and restores both findings.
-- Removed the unavailable paid Studio offer after independently reproducing
-  `GET https://api.sociobot.in/api/v1/products/caption-placement-check/checkout`
-  returning HTTP 404. The features that had been gated (saved regions and JSON
-  reports) are available locally without an advertised purchase. This is the
-  closest honest release state until the factory registers a billing product.
-- Replaced the nested review `aside` with a normal in-main container and moved
-  skip links into headers. Populated demo axe checks now have no moderate,
-  serious, or critical violations at desktop or 390px.
-- Aligned package, Tauri, Cargo, site, and release-workflow metadata at
-  `0.1.2` / `v0.1.2`.
+No product code was changed.
 
-## Verification
+## Release blockers
 
-Completed from a clean dependency install on 2026-08-28:
+1. The exact `@claim:offline-demo` command fails after the offline reload; the
+   full E2E suite also fails the same test (11 passed, 1 failed). A failing
+   declared claim is an automatic release failure. The landing and checker
+   register one service worker as both `?revision=3` and `?revision=6`, causing
+   an update cycle whenever users move between them.
+2. The claimed 30-video accuracy benchmark is 30 metadata records over two
+   synthetic pixel patterns, not a labeled 30-video set. It tests no face,
+   real video, realistic false-alert opportunities, or non-Latin on-frame
+   text. Current Chromium also exposes no `FaceDetector` implementation.
+3. Public claims for SRT/WebVTT support, face/dense detection,
+   recommendations, manual regions, JSON reports, and verified platform
+   downloads are missing dedicated entries/tests in `.factory/claims.json`.
+4. The live 404 page has a serious axe color-contrast failure: `#394440` on
+   `#101313`, measured at 1.84:1.
+5. The native app first-run screen has no **Load sample project** action, and
+   the landing page lacks the desktop contract's three-to-five-frame
+   walkthrough.
+6. The researched one-time purchase is not implemented. No paid offer or
+   billing endpoint is exposed because the Sociobot product is unregistered.
 
-```sh
-npm ci
-npm test                         # 12/12
-npm run test:benchmark           # 1/1; 30 labelled scenarios
-npm run build                    # dist/site and dist/app
-npm run test:e2e                 # 12/12 Chromium checks
-npm run check                    # TypeScript + Cargo check
-sh -n public/install.sh
-npm audit --omit=dev             # 0 vulnerabilities
-```
+## Additional defects
 
-- Every command listed in `.factory/claims.json` passed individually and in
-  the full E2E suite.
-- Playwright axe covered landing, populated demo at 1440px and 390px, checker,
-  and legal pages. It found no serious/critical issues; the populated demo also
-  had no moderate landmark/region issues. Keyboard coverage includes skip link
-  and Arrow/Enter protected-region marking.
-- An attempted standalone `@axe-core/cli` run could not locate a system Chrome
-  in this container. The repository's Playwright Axe integration uses the
-  pinned, preinstalled Chromium and passed the same route checks.
-- Lighthouse mobile against the local production preview: Performance 98,
-  Accessibility 100, Best Practices 100, SEO 100; FCP 1.8 s, LCP 1.8 s,
-  CLS 0. Initial JS/CSS remain below the static budgets.
-- `npm run tauri build` completed locally. Its consumer DEB reports
-  `caption-placement-check` version `0.1.2` for `amd64` and SHA-256
-  `b125be65fd6784997d657d7ec59aa83aecd6aceffb78c95ca3849a37f0c1d2d7`.
-  The GitHub workflow remains the source of all release-platform artifacts.
+- Mobile brand, platform, and footer links have click targets smaller than
+  44×44 CSS px.
+- `/check/`, `/demo/`, and the 404 omit required social metadata; the 404 also
+  logs its expected 404 as a Chromium resource error.
+- `.factory/copy-audit.md` incorrectly says every landing sentence is at most
+  22 words; the final advisory paragraph has 26.
 
-## Deploy and release
+## Verified passes
 
-Pushed repair commit `3d0ed628ba704874d510ec9568ae4c1300ad6a55` and tag
-`v0.1.2`, then deployed `dist/site/` with:
+- First-read and one-click web demo gate passed; the sample immediately shows
+  two actionable findings, Reset demo works, and demo changes do not alter
+  real stored preferences.
+- Six of seven exact claim commands passed. `npm test` passed 12/12;
+  `npm run check` passed after documented Linux prerequisites; `npm run build`
+  produced `dist/site` and `dist/app`; `npm run test:e2e` passed 11/12.
+- Normal SRT and non-Latin WebVTT flows, invalid-input recovery, keyboard
+  protected-region editing, CSV/JSON export, local persistence, and no-upload
+  behavior passed.
+- Five normal routes pass desktop/390 px axe serious/critical checks, semantic
+  smoke tests, visible focus, reduced motion, overflow, and console/page-error
+  checks. Lighthouse mobile is 100/100/100/100 with LCP 0.92 s and CLS 0.
+- The live deployment byte-matches the candidate production build. Security
+  headers and immutable caching for hashed assets are present.
+- Release v0.1.2 contains all required platform artifacts and manifests. A
+  downloaded DEB and the one-line-installed AppImage matched their published
+  SHA-256 values; the extracted DEB application launched under Xvfb.
 
-```sh
-swa deploy dist/site --env production --resource-group sociobot \
-  --app-name sf-caption-placement-check --no-use-keychain
-```
+## Before another release candidate
 
-Live smoke checks at `https://caption-placement-check.sociobot.in` returned
-HTTP 200 for `/`, `/demo/`, `/check/`, `/privacy/`, and `/terms/`. At 390px,
-each has `lang=en`, one `h1`, a `main` landmark, the correct route title, the
-v0.1.2 footer, and no console/page errors. GitHub Actions release run
-`33172830156` completed successfully. Release `v0.1.2` now contains macOS
-arm64/x64, Windows x64, Linux AppImage/DEB/RPM, `SHA256SUMS`, and
-`latest.json`. The released DEB SHA-256
-`7f57446282e20bf631fa7b2d3fa8cf9e85e3448278acc7611438e65f21901308`
-matches `latest.json`.
+- Make the offline claim test reliable from a clean install and use one
+  service-worker revision URL across every route.
+- Replace the synthetic two-pattern benchmark with a rights-cleared labeled
+  30-video corpus that includes faces, realistic dense text, motion, safe
+  controls, and non-Latin on-frame text; measure real interval recall and
+  false alerts per complete ten-minute video.
+- Complete the claims inventory and add one observable demo test per claim.
+- Fix the 404 contrast and all sub-44 px touch targets.
+- Add the sample project to native first run and the required desktop
+  walkthrough.
+- Register the Sociobot billing product before restoring a one-time paid tier.
 
-## Known limits / next operator action
-
-- The Sociobot billing product remains unregistered, so checkout is correctly
-  not advertised. If a paid tier is restored, register the product first and
-  use the hosted Sociobot checkout; add a live purchase regression before
-  putting price or purchase copy back on the site.
-- The benchmark is deterministic representative cue-midpoint frames, not a
-  public claim of real-world accuracy. Extend it with rights-cleared production
-  footage if broader field validation is needed.
-- Desktop releases are unsigned. Signing needs the documented Apple and
-  Windows certificate secrets; no updater is included.
+Unsigned releases remain an operator limitation. If signing is added, wire and
+document `APPLE_CERTIFICATE` and `WINDOWS_CERT_PFX` (plus their passwords) in
+the release workflow; no updater is currently included.
