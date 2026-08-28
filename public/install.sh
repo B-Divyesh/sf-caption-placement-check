@@ -31,6 +31,12 @@ PY
 URL="$(printf '%s\n' "$ASSET_DATA" | sed -n '1p')"
 EXPECTED="$(printf '%s\n' "$ASSET_DATA" | sed -n '2p')"
 NAME="$(printf '%s\n' "$ASSET_DATA" | sed -n '3p')"
+URL="$(python3 - "$URL" <<'PY'
+import sys
+from urllib.parse import quote
+print(quote(sys.argv[1], safe=":/?=&%"))
+PY
+)"
 curl -fL "$URL" -o "$TMP_DIR/$NAME"
 if command -v sha256sum >/dev/null 2>&1; then ACTUAL="$(sha256sum "$TMP_DIR/$NAME" | awk '{print $1}')"; else ACTUAL="$(shasum -a 256 "$TMP_DIR/$NAME" | awk '{print $1}')"; fi
 [ "$ACTUAL" = "$EXPECTED" ] || { echo "Checksum verification failed." >&2; exit 1; }

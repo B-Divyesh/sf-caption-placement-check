@@ -29,10 +29,12 @@ Verification completed on 2026-08-28:
 - `npm run test:e2e`: 4/4 Chromium tests passed, including production routing, keyboard/axe checks, 390px viewport, and an actual local WebM + SRT scan.
 - `npm run check`: TypeScript strict check and `cargo check` passed.
 - `npm audit`: 0 vulnerabilities.
-- Production sizes: landing JS 2.39 KB, combined landing CSS 20.32 KB, checker JS 14.61 KB, checker CSS 11.92 KB, hero WebP 23.02 KB. All are uncompressed and below the stated budgets.
+- Production sizes: landing JS 2.47 KB, combined landing CSS 20.32 KB, checker JS 14.61 KB, checker CSS 11.92 KB, hero WebP 23.02 KB. All are uncompressed and below the stated budgets.
 - Lighthouse mobile (local production preview): Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.1s, CLS 0, total blocking time 0ms.
 - Manual visual review completed at 1440×900 and 390×844. Generated art was checked for text artifacts, brands, anatomy, seams, and palette consistency.
 - Install script syntax: `sh -n public/install.sh` passes. The scripts verify the selected release asset against `latest.json` before installing/opening it.
+- GitHub Actions release run `33157721315`: macOS arm64/x64, Windows x64, Linux x64, and manifest jobs passed. Release: `https://github.com/B-Divyesh/sf-caption-placement-check/releases/tag/v0.1.0`.
+- Published `latest.json` is valid JSON and lists DMG, MSI/EXE, AppImage, DEB, and RPM assets. The downloaded DEB SHA-256 matched both its manifest entry and `SHA256SUMS`.
 
 ## Product and technical limits
 
@@ -45,10 +47,9 @@ Verification completed on 2026-08-28:
 ## Needs operator action
 
 1. Register the paid product slug `caption-placement-check` with the Sociobot billing factory, price it at USD $19 one-time, and set its return URL to `https://caption-placement-check.sociobot.in/check/`. The code intentionally contains no hardcoded billing product ID.
-2. Verify the `v0.1.0` GitHub Actions run finishes and that all release assets are public. Download one asset and compare it with `SHA256SUMS`; also validate `latest.json` with `python3 -m json.tool`.
-3. Deploy `dist/site/` to the product hostname. The page’s release-manifest fetch is enabled only at `caption-placement-check.sociobot.in`, avoiding noisy cross-origin failures in local development.
-4. For signed releases, configure Apple notarization and Windows Authenticode. Certificate material is not present and must never be committed. Expected secret names for that future workflow wiring are `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID`, `WINDOWS_CERT_PFX`, and `WINDOWS_CERT_PASSWORD`. The current workflow deliberately builds unsigned and consumes none of them.
-5. Run the labeled 30-video accuracy set, including non-Latin on-screen scripts and sign-language layouts; tune `denseRegions` thresholds from measured results.
+2. Deploy `dist/site/` to the product hostname. The page’s release-manifest fetch is enabled only at `caption-placement-check.sociobot.in`, avoiding noisy cross-origin failures in local development.
+3. For signed releases, configure Apple notarization and Windows Authenticode. Certificate material is not present and must never be committed. Expected secret names for that future workflow wiring are `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID`, `WINDOWS_CERT_PFX`, and `WINDOWS_CERT_PASSWORD`. The current workflow deliberately builds unsigned and consumes none of them.
+4. Run the labeled 30-video accuracy set, including non-Latin on-screen scripts and sign-language layouts; tune `denseRegions` thresholds from measured results.
 
 ## Next sensible improvements
 

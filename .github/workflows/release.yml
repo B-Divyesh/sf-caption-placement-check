@@ -63,7 +63,10 @@ jobs:
         shell: bash
         run: |
           mkdir release-assets
-          find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.dmg' -o -name '*.msi' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -exec cp {} release-assets/ \;
+          while IFS= read -r -d '' file; do
+            filename="$(basename "$file")"
+            cp "$file" "release-assets/${filename// /.}"
+          done < <(find src-tauri/target/${{ matrix.target }}/release/bundle -type f \( -name '*.dmg' -o -name '*.msi' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -print0)
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.label }}
