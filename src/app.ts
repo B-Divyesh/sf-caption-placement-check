@@ -441,12 +441,9 @@ if (isDemo) void startDemo();
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
   void navigator.serviceWorker.register("/sw.js").then(async () => {
     await navigator.serviceWorker.ready;
-    const resources = performance.getEntriesByType("resource")
-      .map((entry) => entry.name)
-      .filter((url) => new URL(url).origin === location.origin);
-    const documentAssets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
-      .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
-    await caches.open("caption-placement-check-v7").then((cache) => cache.addAll([...new Set([location.pathname, ...resources, ...documentAssets]) ]));
+    // The worker installs the complete checker and demo shells before it
+    // becomes ready. Keeping the page out of that cache transaction avoids
+    // racing a blob preview URL into the same cache during first-run setup.
     document.documentElement.dataset.offlineReady = "true";
   }).catch(() => undefined);
 });
