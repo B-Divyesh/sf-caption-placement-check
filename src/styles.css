@@ -90,6 +90,7 @@ progress::-webkit-progress-bar { background: var(--raised); } progress::-webkit-
 .video-stage { position: relative; display: grid; min-height: 340px; overflow: hidden; place-items: center; background: #050606; box-shadow: 0 28px 70px rgba(0,0,0,.28); }
 .video-stage video { display: block; width: 100%; max-height: 72vh; }
 .video-stage canvas { position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%); pointer-events: none; }
+.video-stage canvas:focus-visible { outline: 3px solid var(--projector); outline-offset: -5px; }
 .video-stage.drawing-region canvas { pointer-events: auto; cursor: crosshair; touch-action: none; }
 .caption-preview { position: absolute; z-index: 2; padding: 6px 12px; background: rgba(0,0,0,.84); color: white; font-size: clamp(13px, 2vw, 20px); font-weight: 700; line-height: 1.25; text-align: center; text-wrap: balance; pointer-events: none; }
 .viewer-tools { display: flex; align-items: center; gap: 16px; min-height: 64px; color: var(--mist); font-size: 14px; }
@@ -123,6 +124,7 @@ progress::-webkit-progress-bar { background: var(--raised); } progress::-webkit-
 .studio-panel p { max-width: 670px; margin-bottom: 0; color: var(--mist); }
 .studio-actions { display: grid; grid-template-columns: auto auto; align-items: center; gap: 8px 16px; }
 .studio-actions .text-button { grid-column: 2; }
+.checkout-pending { max-width: 180px; color: var(--mist); font-size: 14px; }
 .price { font: 700 28px var(--display); }.price small { display: block; color: var(--mist); font: 12px ui-sans-serif, sans-serif; }
 .license-form { grid-column: 1 / -1; max-width: 680px; }
 .license-form > div { display: flex; gap: 8px; }.license-form input { flex: 1; }

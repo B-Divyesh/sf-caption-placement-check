@@ -1,17 +1,17 @@
 [
   {
     "id": "sample-demo",
-    "claim": "Try it with sample data without saving it",
+    "claim": "Try a two-cue sample review without saving it",
     "where": "landing page primary action, demo banner",
     "test": "npm run test:e2e -- --grep @claim:sample-demo",
-    "sandbox": "fresh browser context opens /demo/; sample scan completes and no application storage key is written"
+    "sandbox": "fresh browser context opens /demo/; two findings and recommendations render and no application storage key is written"
   },
   {
     "id": "media-local",
-    "claim": "Sample review stays on this site",
+    "claim": "Sample media stays local and demo ignores real license state",
     "where": "demo flow and privacy policy",
     "test": "npm run test:e2e -- --grep @claim:media-local",
-    "sandbox": "fresh browser context records every request while /demo/ scans its shipped sample; each is same-origin"
+    "sandbox": "fresh browser context seeds a real license, opens /demo/, records every request, and asserts only same-origin sample traffic plus locked Studio controls"
   },
   {
     "id": "offline-demo",
@@ -22,9 +22,9 @@
   },
   {
     "id": "local-scan",
-    "claim": "Checks a video and caption file, then exports a CSV review list",
+    "claim": "Exports the sample review as a CSV list",
     "where": "README and browser checker",
     "test": "npm run test:e2e -- --grep @claim:local-scan",
-    "sandbox": "fresh browser context uploads shipped WebM and SRT fixtures, completes the scan, and downloads the CSV"
+    "sandbox": "fresh browser context opens /demo/, completes its shipped sample scan, downloads CSV, and asserts its header plus two finding rows"
   }
 ]

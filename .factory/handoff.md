@@ -1,5 +1,67 @@
 # Caption Placement Check v0.1.0 — handoff
 
+## Repair 2 (2026-08-28)
+
+Repaired the independent verifier's release blockers from candidate
+`ad24bb2ca7f1262d60f27fc615137f281f263985`.
+
+- Demo mode now bypasses every real license read and verification request. Its
+  shipped sample starts with a protected lower-frame teaching region, so it
+  produces two inspectable findings, recommendations, and a two-row CSV.
+- Service worker shell caching is versioned as `caption-placement-check-v4`.
+  It precaches the checker/demo HTML and their hashed Vite assets at install,
+  while client-side readiness waits for a controlling worker.
+- Protected-region marking now supports keyboard operation: activate it,
+  use arrow keys to position the bounded region, Enter/Space to add it, and
+  Escape to leave the editor. The scan summary updates whenever a manual
+  finding is added.
+- Removed the broken checkout link while the factory billing product returns
+  404. The optional Studio UI clearly says checkout is not published; existing
+  license restore/verification behavior remains available outside demo mode.
+- Added mobile legal-page labels, complete legal metadata/footer, 44px mobile
+  download links, app build credit, social metadata, apple-touch icon, a
+  reviewed original 1200×630 social preview, immutable hashed-asset headers,
+  and a static-host 404 configuration.
+- Desktop download selection now requires a matching architecture and uses
+  AppImage only as the x64 Linux portable fallback. Unknown/unsupported
+  architectures go to the release choices. The shell installer refuses an
+  incompatible architecture instead of selecting a first asset.
+
+### Regression coverage and verification
+
+Fresh install and local verification completed:
+
+```sh
+npm ci
+npm test
+npm run test:e2e
+npm run check
+npm run build
+sh -n public/install.sh
+npm audit --omit=dev
+```
+
+- Unit suite: 11/11 passed, including architecture-safe release-asset
+  selection.
+- E2E suite: 8/8 passed. It now exercises a useful two-finding demo, real
+  license isolation and same-origin demo traffic, offline shell cache,
+  keyboard protected-region marking, 390px axe checks for legal pages, and
+  CSV header plus row count.
+- `npm run check`, static production build, installer syntax, and production
+  dependency audit passed locally. Built landing assets remain below the
+  static JS/CSS budget; no third-party runtime scripts or fonts are used.
+
+### Remaining operator action
+
+The Sociobot billing product is still not registered: live checkout returned
+`404 {"error":"enabled factory product"}` during this repair. Checkout is
+therefore deliberately not advertised. Register `caption-placement-check` at
+USD $19 with return URL `https://caption-placement-check.sociobot.in/check/`,
+then restore the existing Sociobot checkout link and rerun its live purchase
+verification. The researched 30-video accuracy target still requires a
+reviewer-supplied labeled media set; this repair does not claim a measured
+recall or false-alert rate.
+
 ## Independent verification (2026-08-28) — FAIL
 
 Candidate `ad24bb2ca7f1262d60f27fc615137f281f263985` is **not accepted** at

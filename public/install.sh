@@ -20,9 +20,18 @@ manifest = json.load(open(sys.argv[1], encoding="utf-8"))
 assets = manifest["platforms"][sys.argv[2]]
 if isinstance(assets, dict): assets = [assets]
 arch = sys.argv[3]
-preferred = [a for a in assets if arch in a.get("name", "")]
-if sys.argv[2] == "linux": preferred = [a for a in assets if a.get("name", "").endswith(".AppImage")] or preferred
-asset = (preferred or assets)[0]
+is_arm = arch in {"arm64", "aarch64"}
+is_x64 = arch in {"x86_64", "amd64"}
+if not (is_arm or is_x64):
+    raise SystemExit(f"Unsupported architecture: {arch}. Use the downloads page instead.")
+arch_names = ("aarch64", "arm64") if is_arm else ("x86_64", "x64", "amd64")
+matching = [a for a in assets if any(name in a.get("name", "").lower() for name in arch_names)]
+if sys.argv[2] == "linux":
+    # A portable AppImage is safe across distros; only choose a matching architecture.
+    matching = [a for a in matching if a.get("name", "").endswith(".AppImage")]
+if not matching:
+    raise SystemExit(f"No compatible {sys.argv[2]} build for {arch}. Use the downloads page instead.")
+asset = matching[0]
 print(asset["url"])
 print(asset["sha256"])
 print(asset["name"])

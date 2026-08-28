@@ -7,6 +7,7 @@
     <meta name="description" content="Check a local video and caption file for placement conflicts before publishing." />
     <link rel="canonical" href="https://caption-placement-check.sociobot.in/check/" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
     <title>Caption Placement Check — local video preflight</title>
   </head>
   <body class="app-shell">
@@ -49,7 +50,7 @@
           <div class="viewer-column">
             <div class="video-stage" id="video-stage">
               <video id="video" controls playsinline aria-label="Video preview"></video>
-              <canvas id="overlay" aria-hidden="true"></canvas>
+              <canvas id="overlay" tabindex="-1" aria-label="Protected region editor is inactive." aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Enter Escape"></canvas>
               <div class="caption-preview" id="caption-preview" aria-live="polite"></div>
             </div>
             <div class="viewer-tools">
@@ -70,11 +71,11 @@
 
       <section class="studio-panel" aria-labelledby="studio-title">
         <div><p class="eyebrow">Optional one-time unlock</p><h2 id="studio-title">Keep repeat productions consistent</h2><p>Studio adds reusable protected-region presets and JSON project reports. Core scanning, recommendations, and CSV export stay free.</p></div>
-        <div class="studio-actions"><span class="price">$19 <small>once</small></span><a class="primary-button" href="https://api.sociobot.in/api/v1/products/caption-placement-check/checkout" id="buy-link">Buy Studio</a><button class="text-button" id="restore-license" type="button">Restore a license</button></div>
+        <div class="studio-actions"><span class="price">$19 <small>once</small></span><span class="checkout-pending" id="buy-link">Studio purchase is being set up.</span><button class="text-button" id="restore-license" type="button">Restore a license</button></div>
         <form id="license-form" class="license-form" hidden><label for="license-token">License token</label><div><input id="license-token" autocomplete="off" spellcheck="false" /><button class="secondary-button" type="submit">Verify license</button></div><p id="license-status" role="status"></p></form>
       </section>
     </main>
-    <footer class="app-footer"><span>Made for careful publishing.</span><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav></footer>
+    <footer class="app-footer"><span>Made for careful publishing.</span><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav><small>Built by Param Factory · v0.1.1</small></footer>
     <script type="module" src="../src/app.ts"></script>
   </body>
 </html>

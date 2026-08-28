@@ -10,12 +10,12 @@ Try the isolated sample review in one click: <https://caption-placement-check.so
 
 ## What it does
 
-- Processes video and caption files locally—media is never uploaded.
+- Processes video and caption files in local app memory.
 - Parses SRT and WebVTT, including cue position settings and non-Latin text.
-- Uses the platform face detector when available and a script-agnostic edge-density heuristic everywhere.
+- Uses an available platform face detector and a visual-density heuristic as advisory signals.
 - Lets a reviewer draw protected regions for interpreters, slides, signs, or other meaningful content.
 - Exports the review list as CSV for free.
-- Offers an optional $19 one-time Studio license for reusable region presets and JSON project reports. Checkout and verification use the Sociobot billing API.
+- Keeps Studio region presets and JSON project reports ready for a future $19 license. Checkout is not published yet.
 
 ## Run locally
 
@@ -44,7 +44,7 @@ The landing page reads release metadata from the CORS-enabled GitHub Releases AP
 
 ## Install
 
-The landing page detects macOS, Windows, or Linux and resolves its primary button from the latest release manifest. Terminal installers download and verify SHA-256 before opening/installing the matching asset:
+The landing page detects the operating system and only selects a matching architecture when the browser provides one. Otherwise it opens the release choices. Terminal installers download and verify SHA-256 before opening/installing a matching asset:
 
 ```sh
 curl -fsSL https://caption-placement-check.sociobot.in/install.sh | sh
@@ -58,6 +58,6 @@ Early desktop builds are unsigned. On macOS, right-click the app and choose **Op
 
 ## Privacy and architecture
 
-The app has no telemetry or advertising analytics, uses no runtime CDN resources, and stores only a license token, cached verification verdict, and optional Studio preset locally. See [`site/privacy/index.html`](site/privacy/index.html) and [`site/terms/index.html`](site/terms/index.html).
+The app has no telemetry or advertising analytics and uses no runtime CDN resources. The product may store a license token, cached verification verdict, optional Studio preset, and release metadata locally. Demo mode reads none of those values. See [`site/privacy/index.html`](site/privacy/index.html) and [`site/terms/index.html`](site/terms/index.html).
 
 The visual rationale, asset prompt, and provenance are documented in [`.factory/design.md`](.factory/design.md). The software is MIT licensed.

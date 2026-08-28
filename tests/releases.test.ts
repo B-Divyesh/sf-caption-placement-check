@@ -5,9 +5,10 @@ const release = {
   tag_name: "v0.1.0",
   html_url: "https://github.com/B-Divyesh/sf-caption-placement-check/releases/tag/v0.1.0",
   assets: [
-    { name: "CaptionPlacementCheck.dmg", browser_download_url: "https://github.com/example/mac.dmg" },
-    { name: "CaptionPlacementCheck.msi", browser_download_url: "https://github.com/example/windows.msi" },
-    { name: "caption-placement-check.AppImage", browser_download_url: "https://github.com/example/linux.AppImage" }
+    { name: "CaptionPlacementCheck_aarch64.dmg", browser_download_url: "https://github.com/example/mac-arm.dmg" },
+    { name: "CaptionPlacementCheck_x64.dmg", browser_download_url: "https://github.com/example/mac-x64.dmg" },
+    { name: "CaptionPlacementCheck_x64.msi", browser_download_url: "https://github.com/example/windows.msi" },
+    { name: "caption-placement-check_amd64.AppImage", browser_download_url: "https://github.com/example/linux.AppImage" }
   ]
 };
 
@@ -38,9 +39,11 @@ describe("GitHub release metadata", () => {
     await expect(loadReleaseMetadata(vi.fn().mockResolvedValue({ ok: false }), storage)).resolves.toBeUndefined();
   });
 
-  it("selects the installable asset for each platform", () => {
-    expect(assetForPlatform(release, "mac")?.name).toMatch(/dmg$/);
-    expect(assetForPlatform(release, "windows")?.name).toMatch(/msi$/);
-    expect(assetForPlatform(release, "linux")?.name).toMatch(/AppImage$/);
+  it("@regression:architecture never chooses an incompatible desktop package", () => {
+    expect(assetForPlatform(release, "mac", "x64")?.name).toBe("CaptionPlacementCheck_x64.dmg");
+    expect(assetForPlatform(release, "mac", "arm64")?.name).toBe("CaptionPlacementCheck_aarch64.dmg");
+    expect(assetForPlatform(release, "windows", "x64")?.name).toMatch(/\.msi$/);
+    expect(assetForPlatform(release, "linux", "x64")?.name).toMatch(/amd64\.AppImage$/);
+    expect(assetForPlatform(release, "linux", "arm64")).toBeUndefined();
   });
 });

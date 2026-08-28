@@ -46,10 +46,10 @@ At desktop widths the frame and cue list share the bench. Below 860px they stack
 ## Asset plan and provenance
 
 - Hero: original 3:2 environmental illustration generated with the factory Azure image deployment on 2026-08-28. Prompt sheet below. Source PNG and prompt JSON live in `assets/src/`; optimized WebP lives in `public/assets/`.
+- Social preview: original 1200×630 projection-theatre crop generated with the same factory deployment on 2026-08-28, reviewed for text artifacts, brands, and unintended symbols. It contains no readable text, logos, or identifiable people. Prompt provenance is `public/assets/social-projection-room.png.json`; the final PNG is a crop composed from that original render.
 - App mark and interface icons: hand-authored geometric SVG/CSS (frame corners, cue mark, arrows), MIT-covered with this repository.
 - No stock assets, third-party logos, real people, or copyrighted characters.
 
 ### Hero prompt sheet
 
 Use case: `stylized-concept`. Asset type: landing hero. Primary request: a cinematic environmental illustration of an empty small lecture theatre after a screening, with a luminous projection showing an abstract silhouetted presenter beside a slide and a translucent lower-third caption-safe region that clearly does not cover either subject. World: practical projection booth, worn dark walls, quiet educational venue. Materials: matte plaster, brushed dark metal, faint dust in projector light, paper cue slips. Light/lens: wide 35mm view, low warm projector beam, deep falloff, restrained film grain. Palette words: carbon black, warm parchment, projector amber, muted mint. Composition: landscape, image content weighted to the right with calm negative shadow space on the left; no UI screenshot. Avoid: readable text, letters, watermark, logo, brand, photoreal identifiable people, faces, neon gradient, glossy sci-fi, generic laptop mockup, extra limbs, misleading detection boxes.
-

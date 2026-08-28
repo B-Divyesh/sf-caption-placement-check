@@ -18,6 +18,11 @@ const inputError = $("#input-error");
 const placement = $("#placement") as HTMLSelectElement;
 const isDemo = location.pathname.replace(/\/+$/, "") === "/demo" || new URLSearchParams(location.search).get("demo") === "1";
 
+if (isDemo) {
+  document.title = "Demo — Caption Placement Check";
+  document.querySelector('link[rel="canonical"]')?.setAttribute("href", "https://caption-placement-check.sociobot.in/demo/");
+}
+
 let videoFile: File | null = null;
 let captionFile: File | null = null;
 let cues: CaptionCue[] = [];
@@ -26,6 +31,7 @@ let activeFinding: Finding | null = null;
 let protectedRegions: Region[] = [];
 let drawing = false;
 let drawStart: { x: number; y: number } | null = null;
+let keyboardRegion: Region = { x: 0.12, y: 0.68, width: 0.76, height: 0.18 };
 let currentFilter: "open" | "all" = "open";
 let scanCancelled = false;
 let videoUrl = "";
@@ -149,7 +155,7 @@ async function scanVideo() {
   scanCancelled = false;
   findings = [];
   activeFinding = null;
-  protectedRegions = [];
+  protectedRegions = isDemo ? [{ x: 0.12, y: 0.72, width: 0.76, height: 0.2 }] : [];
   if (!isDemo) try {
     const cachedVerdict = JSON.parse(localStorage.getItem(VERDICT_KEY) || "null") as { valid?: boolean } | null;
     if (cachedVerdict?.valid) protectedRegions = JSON.parse(localStorage.getItem("cpc:protected-regions") || "[]") as Region[];
@@ -171,12 +177,13 @@ async function scanVideo() {
     const cap = captionRegion(cue);
     const candidates: Array<{ region: Region; kind: FindingKind; confidence: number }> = [
       ...faces.map((region) => ({ region, kind: "face" as const, confidence: 0.9 })),
-      ...dense.map((region) => ({ region, kind: "dense" as const, confidence: 0.68 }))
+      ...dense.map((region) => ({ region, kind: "dense" as const, confidence: 0.68 })),
+      ...protectedRegions.map((region) => ({ region, kind: "protected" as const, confidence: 1 }))
     ];
     const hit = candidates.sort((a, b) => intersectionRatio(cap, b.region) - intersectionRatio(cap, a.region))
       .find((candidate) => intersectionRatio(cap, candidate.region) > (candidate.kind === "face" ? 0.08 : 0.24));
     if (hit) {
-      findings.push({ id: `finding-${index}`, cue, kind: hit.kind, confidence: hit.confidence, region: hit.region, captionRegion: cap, recommendation: recommendZone([...dense, ...faces], cap), reviewed: false });
+      findings.push({ id: `finding-${index}`, cue, kind: hit.kind, confidence: hit.confidence, region: hit.region, captionRegion: cap, recommendation: recommendZone([...dense, ...faces, ...protectedRegions], cap), reviewed: false });
     }
     const percent = Math.round(((index + 1) / total) * 100);
     ($("#scan-progress") as HTMLProgressElement).value = percent;
@@ -186,10 +193,14 @@ async function scanVideo() {
     await new Promise((resolve) => requestAnimationFrame(resolve));
   }
   $("#progress-wrap").hidden = true;
-  $("#scan-summary").textContent = `${cues.length} cues sampled · ${findings.length} ${findings.length === 1 ? "cue needs" : "cues need"} a closer look`;
+  updateScanSummary();
   renderFindings();
   if (findings[0]) selectFinding(findings[0]);
   else { await seek(0); drawOverlay(); }
+}
+
+function updateScanSummary() {
+  $("#scan-summary").textContent = `${cues.length} cues sampled · ${findings.length} ${findings.length === 1 ? "cue needs" : "cues need"} a closer look`;
 }
 
 function reasonLabel(kind: FindingKind) {
@@ -272,8 +283,28 @@ $("#mark-region").addEventListener("click", (event) => {
   drawing = !drawing;
   (event.currentTarget as HTMLButtonElement).setAttribute("aria-pressed", String(drawing));
   stage.classList.toggle("drawing-region", drawing);
-  $("#region-help").textContent = drawing ? "Drag across the video to mark what captions must avoid." : "Add an interpreter, slide, or sign that automation may miss.";
+  overlay.tabIndex = drawing ? 0 : -1;
+  overlay.setAttribute("aria-label", drawing ? "Protected region editor. Use arrow keys to move the highlighted region, then press Enter to add it. Press Escape to stop marking." : "Protected region editor is inactive.");
+  if (drawing) {
+    keyboardRegion = { x: 0.12, y: 0.68, width: 0.76, height: 0.18 };
+    drawOverlay(keyboardRegion);
+    overlay.focus();
+  }
+  $("#region-help").textContent = drawing ? "Drag across the video, or use arrow keys to move the keyboard region and Enter to add it." : "Add an interpreter, slide, or sign that automation may miss.";
 });
+
+function addProtectedRegion(region: Region) {
+  if (region.width <= 0.03 || region.height <= 0.03) return;
+  protectedRegions.push(region);
+  for (const [index, cue] of cues.entries()) {
+    const cap = captionRegion(cue);
+    if (intersectionRatio(cap, region) > 0.08 && !findings.some((item) => item.cue.id === cue.id && item.kind === "protected"))
+      findings.push({ id: `protected-${index}`, cue, kind: "protected", confidence: 1, region, captionRegion: cap, recommendation: recommendZone([region], cap), reviewed: false });
+  }
+  updateScanSummary();
+  renderFindings();
+  drawOverlay();
+}
 
 overlay.addEventListener("pointerdown", (event) => {
   if (!drawing) return;
@@ -290,15 +321,31 @@ overlay.addEventListener("pointerup", (event) => {
   const x = event.offsetX / overlay.clientWidth, y = event.offsetY / overlay.clientHeight;
   const region = { x: Math.min(x, drawStart.x), y: Math.min(y, drawStart.y), width: Math.abs(x - drawStart.x), height: Math.abs(y - drawStart.y) };
   drawStart = null;
-  if (region.width > 0.03 && region.height > 0.03) {
-    protectedRegions.push(region);
-    for (const [index, cue] of cues.entries()) {
-      const cap = captionRegion(cue);
-      if (intersectionRatio(cap, region) > 0.08 && !findings.some((item) => item.cue.id === cue.id && item.kind === "protected"))
-        findings.push({ id: `protected-${index}`, cue, kind: "protected", confidence: 1, region, captionRegion: cap, recommendation: recommendZone([region], cap), reviewed: false });
-    }
-    renderFindings(); drawOverlay();
+  addProtectedRegion(region);
+});
+
+overlay.addEventListener("keydown", (event) => {
+  if (!drawing) return;
+  const step = event.shiftKey ? 0.1 : 0.04;
+  const moves: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    addProtectedRegion({ ...keyboardRegion });
+    $("#region-help").textContent = "Protected region added. Use arrow keys to place another, or Escape to stop marking.";
+    return;
   }
+  if (event.key === "Escape") {
+    event.preventDefault();
+    $("#mark-region").click();
+    $("#mark-region").focus();
+    return;
+  }
+  const move = moves[event.key];
+  if (!move) return;
+  event.preventDefault();
+  keyboardRegion.x = Math.min(1 - keyboardRegion.width, Math.max(0, keyboardRegion.x + move[0]));
+  keyboardRegion.y = Math.min(1 - keyboardRegion.height, Math.max(0, keyboardRegion.y + move[1]));
+  drawOverlay(keyboardRegion);
 });
 
 document.querySelectorAll<HTMLButtonElement>(".filter").forEach((button) => button.addEventListener("click", () => {
@@ -346,7 +393,7 @@ if (queryLicense) {
   localStorage.setItem(LICENSE_KEY, queryLicense);
   history.replaceState({}, "", location.pathname + location.hash);
 }
-const savedLicense = queryLicense || localStorage.getItem(LICENSE_KEY);
+const savedLicense = !isDemo ? queryLicense || localStorage.getItem(LICENSE_KEY) : null;
 if (savedLicense) void verifyLicense(savedLicense);
 
 $("#restore-license").addEventListener("click", () => { $("#license-form").hidden = false; ($("#license-token") as HTMLInputElement).focus(); });
@@ -393,21 +440,21 @@ async function startDemo() {
 if (isDemo) void startDemo();
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
-  void navigator.serviceWorker.register("/sw.js?revision=3").then(async (registration) => {
-    const installing = registration.installing;
-    if (installing) await new Promise<void>((resolve) => installing.addEventListener("statechange", () => {
-      if (installing.state === "activated" || installing.state === "redundant") resolve();
-    }));
-    await navigator.serviceWorker.ready;
-    if (registration.active && navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL !== registration.active.scriptURL) {
-      await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
+  void navigator.serviceWorker.register("/sw.js?revision=4").then(async () => {
+    const ready = await navigator.serviceWorker.ready;
+    const needsControlledReload = !navigator.serviceWorker.controller || navigator.serviceWorker.controller.scriptURL !== ready.active?.scriptURL;
+    if (needsControlledReload) {
+      await Promise.race([
+        new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true })),
+        new Promise<void>((resolve) => window.setTimeout(resolve, 750))
+      ]);
     }
     const resources = performance.getEntriesByType("resource")
       .map((entry) => entry.name)
       .filter((url) => new URL(url).origin === location.origin);
     const documentAssets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
       .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
-    await caches.open("caption-placement-check-v3").then((cache) => cache.addAll([...new Set([location.pathname, ...resources, ...documentAssets]) ]));
+    await caches.open("caption-placement-check-v4").then((cache) => cache.addAll([...new Set([location.pathname, ...resources, ...documentAssets]) ]));
     document.documentElement.dataset.offlineReady = "true";
   }).catch(() => undefined);
 });

@@ -1,6 +1,6 @@
 import "./styles.css";
 import "./site.css";
-import { assetForPlatform, loadReleaseMetadata, RELEASE_PAGE, type Platform } from "./releases";
+import { assetForPlatform, loadReleaseMetadata, RELEASE_PAGE, type Architecture, type Platform } from "./releases";
 
 const download = document.querySelector<HTMLAnchorElement>("#platform-download");
 const label = document.querySelector("#platform-label");
@@ -11,7 +11,19 @@ const isMac = /Macintosh|Mac OS X/i.test(navigator.userAgent);
 const platform: Platform = isWindows ? "windows" : isMac ? "mac" : "linux";
 const names = { windows: "Windows", mac: "macOS", linux: "Linux" };
 if (label) label.textContent = `${names[platform]} detected`;
-if (download) download.textContent = `Download for ${names[platform]}`;
+if (download) download.textContent = `Choose a ${names[platform]} build`;
+
+async function detectedArchitecture(): Promise<Architecture | undefined> {
+  const navigatorWithHints = navigator as Navigator & { userAgentData?: { getHighEntropyValues(values: string[]): Promise<{ architecture?: string; bitness?: string }> } };
+  try {
+    const hints = await navigatorWithHints.userAgentData?.getHighEntropyValues(["architecture", "bitness"]);
+    if (hints?.architecture && /arm|aarch/i.test(hints.architecture)) return "arm64";
+    if (hints?.architecture && /x86|amd/i.test(hints.architecture)) return "x64";
+  } catch { /* Browsers can deny high-entropy hints. A release page is safer than a wrong binary. */ }
+  if (/Intel Mac OS X|Win64|x86_64|x64|amd64/i.test(navigator.userAgent)) return "x64";
+  if (/aarch64|arm64/i.test(navigator.userAgent)) return "arm64";
+  return undefined;
+}
 
 function publishingState() {
   if (download) download.href = RELEASE_PAGE;
@@ -20,13 +32,21 @@ function publishingState() {
 }
 
 const isProduction = location.hostname === "caption-placement-check.sociobot.in";
-if (download && status && isProduction) void loadReleaseMetadata(fetch, localStorage).then((release) => {
+if (download && status && isProduction) void Promise.all([loadReleaseMetadata(fetch, localStorage), detectedArchitecture()]).then(([release, architecture]) => {
   if (!release) return publishingState();
-  const asset = assetForPlatform(release, platform);
-  if (!asset) return publishingState();
+  const asset = architecture ? assetForPlatform(release, platform, architecture) : undefined;
+  if (!asset) {
+    download.href = release.html_url;
+    download.textContent = `Choose a ${names[platform]} build`;
+    if (label) label.textContent = architecture ? `${names[platform]} build unavailable` : `${names[platform]} architecture not detected`;
+    links.forEach((link) => { link.href = release.html_url; });
+    status.textContent = "Choose the build that matches your computer. Downloads include SHA-256 checksums.";
+    return;
+  }
   download.href = asset.browser_download_url;
+  download.textContent = `Download for ${names[platform]} ${architecture === "arm64" ? "ARM64" : "x64"}`;
   for (const link of links) {
-    const target = assetForPlatform(release, link.dataset.platform as Platform);
+    const target = assetForPlatform(release, link.dataset.platform as Platform, architecture);
     link.href = target?.browser_download_url || release.html_url;
   }
   status.textContent = `Latest: ${release.tag_name} · SHA-256 checksums are published with this release.`;

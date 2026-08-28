@@ -1,6 +1,7 @@
 export type ReleaseAsset = { name: string; browser_download_url: string };
 export type GitHubRelease = { tag_name: string; html_url: string; assets: ReleaseAsset[] };
 export type Platform = "windows" | "mac" | "linux";
+export type Architecture = "x64" | "arm64";
 
 export const RELEASE_API = "https://api.github.com/repos/B-Divyesh/sf-caption-placement-check/releases/latest";
 export const RELEASE_PAGE = "https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest";
@@ -11,13 +12,14 @@ type CachedRelease = { savedAt: number; release: GitHubRelease };
 type StorageLike = Pick<Storage, "getItem" | "setItem">;
 type FetchLike = (input: string, init?: RequestInit) => Promise<Pick<Response, "ok" | "json">>;
 
-export function assetForPlatform(release: GitHubRelease, platform: Platform): ReleaseAsset | undefined {
-  const extensions: Record<Platform, RegExp> = {
-    mac: /\.dmg$/i,
-    windows: /\.(msi|exe)$/i,
-    linux: /\.(AppImage|deb|rpm)$/i
-  };
-  return release.assets.find((asset) => extensions[platform].test(asset.name));
+export function assetForPlatform(release: GitHubRelease, platform: Platform, architecture?: Architecture): ReleaseAsset | undefined {
+  const architecturePattern = architecture === "arm64" ? /(aarch64|arm64)/i : architecture === "x64" ? /(x86_64|x64|amd64)/i : undefined;
+  const matchesArchitecture = (asset: ReleaseAsset) => !architecturePattern || architecturePattern.test(asset.name);
+  if (platform === "mac") return release.assets.find((asset) => /\.dmg$/i.test(asset.name) && matchesArchitecture(asset));
+  if (platform === "windows") return release.assets.find((asset) => /\.msi$/i.test(asset.name) && matchesArchitecture(asset))
+    || release.assets.find((asset) => /\.exe$/i.test(asset.name) && matchesArchitecture(asset));
+  // AppImage is the portable fallback. Do not guess a Debian/RPM package from a browser user agent.
+  return release.assets.find((asset) => /\.AppImage$/i.test(asset.name) && matchesArchitecture(asset));
 }
 
 function validRelease(value: unknown): value is GitHubRelease {
