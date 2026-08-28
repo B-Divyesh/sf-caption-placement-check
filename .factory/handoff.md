@@ -74,8 +74,11 @@ Live smoke checks at `https://caption-placement-check.sociobot.in` returned
 HTTP 200 for `/`, `/demo/`, `/check/`, `/privacy/`, and `/terms/`. At 390px,
 each has `lang=en`, one `h1`, a `main` landmark, the correct route title, the
 v0.1.2 footer, and no console/page errors. GitHub Actions release run
-`33172830156` is building the v0.1.2 macOS arm64/x64, Windows x64, and Linux
-x64 artifacts plus `SHA256SUMS` and `latest.json`.
+`33172830156` completed successfully. Release `v0.1.2` now contains macOS
+arm64/x64, Windows x64, Linux AppImage/DEB/RPM, `SHA256SUMS`, and
+`latest.json`. The released DEB SHA-256
+`7f57446282e20bf631fa7b2d3fa8cf9e85e3448278acc7611438e65f21901308`
+matches `latest.json`.
 
 ## Known limits / next operator action
 
