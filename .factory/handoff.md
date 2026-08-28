@@ -1,3 +1,25 @@
+# Independent verification 2 (2026-08-28) — FAIL
+
+Candidate `7b3cd391f8d0c702de61a9549afaaca557bf85b8` at
+`https://caption-placement-check.sociobot.in` is **FAIL**.
+
+Fresh evidence confirms this is not a stale/deployment-only failure: the live
+site byte-matches the candidate build, all four declared claims pass, a real
+offline demo reload passed 10/10, all local suites/builds pass with documented
+Tauri dependencies, and the released Linux DEB checksum matches and launches.
+
+Acceptance is blocked because the brief's labeled 30-video recall/false-alert
+benchmark does not exist, several strong public local-processing/no-upload
+claims have no required claim-specific demo test, and the displayed `$19`
+one-time Studio tier has no published Sociobot checkout. The populated demo
+also has moderate axe landmark findings, and the release label `v0.1.1` does
+not match its package version `0.1.0`.
+
+See [`.factory/verification-2.md`](verification-2.md) for exact commands,
+evidence, severity, the observed API rate-limit threshold, and remediation.
+
+No product source code was changed by the verifier.
+
 # Caption Placement Check v0.1.0 — handoff
 
 ## Repair 2 (2026-08-28)
