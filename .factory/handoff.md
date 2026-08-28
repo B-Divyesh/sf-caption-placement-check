@@ -1,42 +1,72 @@
-# Review 1 handoff
+# Caption Placement Check — polish round 1 handoff
 
 ## Result
 
-Adversarial first-read review 1 is complete. Verdict: **FAIL** with 29 findings
-(four blocking, thirteen major, twelve minor). No product code was changed.
+All 29 findings in `.factory/review-1.md` are resolved. There were no earlier review or polish reports. The repaired static site is live at <https://caption-placement-check.sociobot.in>, and desktop release `v0.1.4` was built from repair commit `1647fea2ea7288c6c53d81dc939603f7e18da3da`.
 
-The full report is `.factory/review-1.md`.
+The unavailable paid offer was removed because the repository cannot register billing infrastructure. JSON project reports are now free. The site makes no checkout or license request and does not advertise a paid tier.
 
-## Main blockers
+## What changed
 
-1. The public **Buy Studio** link returns HTTP 404.
-2. Demo mode reads a pre-existing real license key and attempts live license
-   verification, contrary to the sandbox contract.
-3. Terms say project reports are free while the product charges $19 for them.
-4. `@claim:local-detection` failed once in the complete E2E suite, then passed
-   in isolation/repeats, showing nondeterministic claim coverage.
+- Rewrote the first screen to state the job, audience, sample action, result, and three facts above the fold.
+- Made `/?demo=1` enter the populated sandbox in one click with a persistent banner, Reset, and Start for real.
+- Removed all demo access to real license state. Seeded real keys remain unread and unchanged.
+- Made video seeking and frame readiness deterministic before detection.
+- Shipped Arabic and Japanese sample captions and added observable Unicode coverage.
+- Made JSON reports free and aligned landing, checker, Terms, Privacy, README, and tests.
+- Added a 22-entry claim inventory with exactly one tagged test per claim.
+- Strengthened release tests to resolve every supported package, verify responses, compare manifests, hash an installer, and inspect signing state.
+- Added real route titles, metadata, 180 × 180 touch icon, designed 404, shared navigation/footer, arrival focus, announcements, legal links, and external-link labels.
+- Reworked phone layout while preserving the projection-room visual system and original artwork.
+- Updated `README.md`, `.factory/demo.md`, `.factory/design.md`, `.factory/copy-audit.md`, `.factory/catalog-description.txt`, and `.factory/polish-1.md`.
 
-## Verification performed
+## Verification
 
-- Cold live reads at 390 × 844 and 1440 × 900.
-- One-click demo, seeded real-storage isolation, Reset, offline reload, and
-  intercepted network checks.
-- All 13 exact commands from `.factory/claims.json`.
-- Full landing/README sentence inventory and word counts.
-- Live route metadata, unknown-route 404, link crawl, back/focus behavior,
-  headers, and mobile overflow checks.
-- Live axe scans on `/`, `/demo/`, `/check/`, `/privacy/`, `/terms/`, and
-  `/404.html` at mobile and desktop widths: zero violations.
-- Prior handoff repairs for offline caching and v0.1.3 release provenance.
-- `npm test` (12/12), `npm run build` (pass), `npm run test:benchmark` (pass),
-  `npx tsc --noEmit` (pass).
-- `npm run test:e2e`: first run failed `local-detection`; five direct repeats
-  and a second full run passed.
-- `npm run check`: TypeScript passed; Rust could not start because the clean
-  image lacks documented system package `glib-2.0`.
+Run from the repository root:
 
-## Next step
+```sh
+npm ci
+npm test
+npm run test:e2e
+npm run test:e2e -- --repeat-each=2
+npm run test:benchmark
+npm run build
+npm run check
+```
 
-Start with F-1-1 through F-1-4, add regression coverage for seeded demo storage
-and the real checkout link, then address claim inventory and route consistency
-before requesting review 2.
+Recorded results on 2026-08-28:
+
+- Every exact command in `.factory/claims.json`: 22/22 passed from a clean clone.
+- Unit/integration: 16/16 passed.
+- Browser: 23/23 passed; repeated full suite: 46/46 passed. The later pricing-consistency regression passed separately.
+- Benchmark: 30/30 labelled videos passed.
+- Build: passed; `dist/site` and the Tauri web bundle were produced.
+- TypeScript and Rust: passed. The documented Linux Tauri packages were installed before `cargo check`.
+- Dependency audit: zero vulnerabilities.
+- Installer syntax checks: passed.
+- Local verifier: `.factory/evidence/verify-final-local/verify.json` reports correct title, `lang`, one `h1`, `main`, alt text, labels, and zero console errors.
+- Live verifier: root loaded in 786 ms and demo in 793 ms; both had zero console errors.
+- Live Axe: six routes at 390 × 844 and 1440 × 900 had no serious or critical violations.
+- Live route audit: no horizontal overflow; route-specific titles, focus, shared navigation/footer, icon metadata, and 404 status all passed.
+- Live privacy audit: seeded storage was unread and unchanged; demo traffic stayed same-origin.
+- Live offline audit: the demo reloaded with its banner, two-caption summary, and two alerts.
+- Lighthouse mobile: performance 100, accessibility 100, best practices 100, SEO 100; LCP 1.1 s, CLS 0, TBT 0 ms.
+
+Visual evidence is under `.factory/evidence/`. The finding-by-finding matrix is `.factory/polish-1.md`.
+
+## Deployment and release
+
+- Production: <https://caption-placement-check.sociobot.in>
+- Deployment class: static Azure Static Web Apps, built with `npm run build:site` into `dist/site`.
+- Desktop class: Tauri 2; GitHub Actions builds macOS arm64/x64, Windows x64, Linux AppImage, and Linux deb packages.
+- Release: <https://github.com/B-Divyesh/sf-caption-placement-check/releases/tag/v0.1.4>
+- Release workflow: <https://github.com/B-Divyesh/sf-caption-placement-check/actions/runs/33196238348>
+- The deployment CLI created an ignored local credential file; it was deleted immediately and no secret was committed.
+
+## Known gaps
+
+No product or review finding remains open. Automated caption placement is advisory, as the interface states; users should still watch the final captioned export.
+
+## Needs operator action
+
+Current desktop builds are intentionally unsigned and tested as such. Add the repository signing secrets documented by the release workflow when Apple notarization and Windows Authenticode certificates become available.

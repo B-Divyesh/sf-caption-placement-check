@@ -1,0 +1,14 @@
+{
+  "url": "https://caption-placement-check.sociobot.in/",
+  "loadMs": 786,
+  "errors": [],
+  "a11y": {
+    "title": "Caption Placement Check — check caption placement",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 2496
+  }
+}

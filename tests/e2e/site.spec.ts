@@ -92,6 +92,23 @@ test("@claim:no-account completes both free exports without account or purchase 
   expect(JSON.parse((await downloadText(page, "Export project as JSON")).content)).toMatchObject({ schema: 1 });
 });
 
+test("free feature wording agrees across the landing page, checker, and terms", async ({ page }) => {
+  await page.route(releaseApi, (route) => route.abort());
+  await page.goto("/");
+  await expect(page.getByText("CSV and JSON exports are free")).toBeVisible();
+  await expect(page.getByText(/\$19|buy studio|purchase/i)).toHaveCount(0);
+
+  await page.goto("/demo/?demo=1");
+  await expect(page.locator("#findings li")).toHaveCount(2, { timeout: 20_000 });
+  await expect(page.getByRole("button", { name: "Export project as JSON" })).toBeEnabled();
+  await expect(page.getByText(/license|buy studio|purchase/i)).toHaveCount(0);
+
+  await page.goto("/terms/");
+  await expect(page.getByText("Scanning, recommendations, protected regions, CSV export, saved regions, and JSON project reports are free.")).toBeVisible();
+  await expect(page.getByText("No purchase or account is required.")).toBeVisible();
+  await expect(page.getByText(/\$19|buy studio/i)).toHaveCount(0);
+});
+
 test("@claim:saved-regions-local writes only after Save", async ({ page }) => {
   await page.goto("/check/");
   await scan(page);
