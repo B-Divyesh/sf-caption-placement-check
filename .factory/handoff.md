@@ -44,8 +44,14 @@ This repair starts from verifier report commit
 
 ## Deployment and operator notes
 
-Push this repair commit to `main` for the static deployment configuration.
-The existing desktop release workflow remains the artifact producer; it should
-be run for the next version tag so desktop bundles contain the repair. Desktop
-bundles are still unsigned. Signing requires `APPLE_CERTIFICATE` and
-`WINDOWS_CERT_PFX` plus their passwords; no updater is shipped.
+Repair commit `234cdff6dcf64bb15faa834cb77b6b62ecfe9389` is pushed to `main`.
+The configured live origin still served `caption-placement-check-v6` after the
+push. A direct Static Web Apps production deploy was attempted with the
+authenticated factory identity, but the CLI stalled while resolving the app
+settings and no deployment token/configuration exists in this repository.
+The static-host publish step therefore remains external to this checkout.
+
+The existing desktop release workflow remains the artifact producer; run it
+for the next version tag so desktop bundles contain the repair. Desktop bundles
+are still unsigned. Signing requires `APPLE_CERTIFICATE` and `WINDOWS_CERT_PFX`
+plus their passwords; no updater is shipped.
