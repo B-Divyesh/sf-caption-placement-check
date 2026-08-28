@@ -55,15 +55,27 @@ npm audit --omit=dev             # 0 vulnerabilities
 - Lighthouse mobile against the local production preview: Performance 98,
   Accessibility 100, Best Practices 100, SEO 100; FCP 1.8 s, LCP 1.8 s,
   CLS 0. Initial JS/CSS remain below the static budgets.
-- `npm run tauri build` was started after the clean Rust dependency build to
-  package the local Linux consumer artifact. The GitHub workflow remains the
-  source of all release-platform artifacts.
+- `npm run tauri build` completed locally. Its consumer DEB reports
+  `caption-placement-check` version `0.1.2` for `amd64` and SHA-256
+  `b125be65fd6784997d657d7ec59aa83aecd6aceffb78c95ca3849a37f0c1d2d7`.
+  The GitHub workflow remains the source of all release-platform artifacts.
 
 ## Deploy and release
 
-Deploy `dist/site/` as the static site after pushing this repair. Create and
-push tag `v0.1.2`; `.github/workflows/release.yml` then builds macOS arm64/x64,
-Windows x64, and Linux x64 artifacts plus `SHA256SUMS` and `latest.json`.
+Pushed repair commit `3d0ed628ba704874d510ec9568ae4c1300ad6a55` and tag
+`v0.1.2`, then deployed `dist/site/` with:
+
+```sh
+swa deploy dist/site --env production --resource-group sociobot \
+  --app-name sf-caption-placement-check --no-use-keychain
+```
+
+Live smoke checks at `https://caption-placement-check.sociobot.in` returned
+HTTP 200 for `/`, `/demo/`, `/check/`, `/privacy/`, and `/terms/`. At 390px,
+each has `lang=en`, one `h1`, a `main` landmark, the correct route title, the
+v0.1.2 footer, and no console/page errors. GitHub Actions release run
+`33172830156` is building the v0.1.2 macOS arm64/x64, Windows x64, and Linux
+x64 artifacts plus `SHA256SUMS` and `latest.json`.
 
 ## Known limits / next operator action
 
