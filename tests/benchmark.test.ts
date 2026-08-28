@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { curatedThirtyVideoSet } from "./benchmark/manifest";
 
 describe("labelled 30-video placement benchmark", () => {
-  it("@regression:brief-success-measure meets the documented recall and false-alert thresholds", () => {
+  it("@claim:benchmark-corpus includes 30 labelled encoded video fixtures", () => {
     expect(curatedThirtyVideoSet).toHaveLength(30);
     expect(new Set(curatedThirtyVideoSet.map((video) => video.id)).size).toBe(30);
     expect(new Set(curatedThirtyVideoSet.map((video) => video.language)).size).toBeGreaterThanOrEqual(8);

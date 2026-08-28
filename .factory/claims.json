@@ -1,93 +1,156 @@
 [
   {
     "id": "sample-demo",
-    "claim": "Try a two-cue sample review without saving it",
-    "where": "landing page primary action, demo banner",
+    "claim": "The sample opens with two useful alerts and saves no demo data",
+    "where": "first-screen action, demo banner, README",
     "test": "npm run test:e2e -- --grep @claim:sample-demo",
-    "sandbox": "fresh browser context opens /demo/; two findings and recommendations render and no application storage key is written"
+    "sandbox": "fresh browser context opens /?demo=1; two alerts and recommendations render; no demo or product storage key is created"
+  },
+  {
+    "id": "demo-isolation",
+    "claim": "Demo mode does not read, send, or change real checker and license data",
+    "where": "demo banner, privacy policy, README",
+    "test": "npm run test:e2e -- --grep @claim:demo-isolation",
+    "sandbox": "seed real license, verdict, preset, and release keys; open /?demo=1; edit and reset; assert no protected-key read, no third-party request, and unchanged sentinels"
   },
   {
     "id": "media-local",
-    "claim": "A chosen video and caption file are processed locally and are not uploaded during a review",
-    "where": "landing page, checker setup, privacy policy, README",
+    "claim": "Chosen video and caption files are processed on the device and are not uploaded",
+    "where": "landing page, checker, privacy policy, README",
     "test": "npm run test:e2e -- --grep @claim:media-local",
-    "sandbox": "fresh browser context opens /demo/, enters the checker, scans shipped local fixtures, records all requests and asserts no media-bearing request or third-party request occurs"
+    "sandbox": "enter the real checker from the demo, scan shipped files, and assert no request carries media or leaves the same origin"
   },
   {
     "id": "no-account",
-    "claim": "Core scanning and CSV export work without an account",
-    "where": "landing page facts and terms",
+    "claim": "Scanning plus CSV and JSON exports work without an account or purchase",
+    "where": "landing facts, Terms, README",
     "test": "npm run test:e2e -- --grep @claim:no-account",
-    "sandbox": "fresh browser context opens /demo/, completes the scan, and downloads the free CSV without an account or sign-in control"
+    "sandbox": "fresh demo context downloads both export formats and contains no sign-in, license, or purchase control"
   },
   {
     "id": "saved-regions-local",
-    "claim": "Saved protected regions stay in browser storage until you clear site data",
-    "where": "privacy policy",
+    "claim": "Protected regions are saved in browser storage only when the user chooses Save",
+    "where": "privacy policy, README",
     "test": "npm run test:e2e -- --grep @claim:saved-regions-local",
-    "sandbox": "fresh browser context enters from /demo/, scans local fixtures, saves a keyboard-added region, asserts the browser-only storage key and no third-party request"
+    "sandbox": "fresh context adds a keyboard region; storage stays empty before Save; after Save only the local protected-region key changes"
   },
   {
     "id": "no-tracking",
-    "claim": "The public site uses no advertising or behavioral analytics requests",
-    "where": "site footer and privacy policy",
+    "claim": "The public site uses no advertising, behavioral analytics, or third-party font requests",
+    "where": "privacy policy, README",
     "test": "npm run test:e2e -- --grep @claim:no-tracking",
-    "sandbox": "fresh browser context visits landing, demo, checker, privacy, and terms while recording requests; every request is same-origin"
+    "sandbox": "visit every route with the GitHub release branch enabled; allow only same-origin and api.github.com release requests; reject analytics and external font origins"
   },
   {
     "id": "offline-demo",
-    "claim": "Works offline after the first visit",
-    "where": "desktop download description and README",
+    "claim": "The browser demo works offline after the first visit",
+    "where": "landing download section, README demo documentation",
     "test": "npm run test:e2e -- --grep @claim:offline-demo",
-    "sandbox": "fresh browser context loads /demo/, waits for its service worker, goes offline, and reloads the demo shell"
+    "sandbox": "clean service-worker state; visit /?demo=1; go offline; reload with the banner and two alerts"
   },
   {
     "id": "local-scan",
-    "claim": "Exports the sample review as a CSV list",
-    "where": "README and browser checker",
+    "claim": "The sample review exports a CSV with every alert",
+    "where": "checker, landing page, README",
     "test": "npm run test:e2e -- --grep @claim:local-scan",
-    "sandbox": "fresh browser context opens /demo/, completes its shipped sample scan, downloads CSV, and asserts its header plus two finding rows"
-  },
-  {
-    "id": "caption-formats",
-    "claim": "Reads SRT and WebVTT captions, including positioned cues",
-    "where": "landing page, checker setup, README",
-    "test": "npm run test:e2e -- --grep @claim:caption-formats",
-    "sandbox": "fresh browser context scans the shipped video once with SRT and once with WebVTT line settings"
-  },
-  {
-    "id": "local-detection",
-    "claim": "Flags possible face and dense visual overlap on this device",
-    "where": "landing page, README",
-    "test": "npm run test:e2e -- --grep @claim:local-detection",
-    "sandbox": "fresh browser context scans shipped labelled portrait and dense-media fixtures and sees an advisory finding for each"
-  },
-  {
-    "id": "safe-zone-recommendations",
-    "claim": "Shows a safer caption position with each alert",
-    "where": "landing page, demo review",
-    "test": "npm run test:e2e -- --grep @claim:safe-zone-recommendations",
-    "sandbox": "fresh browser context opens /demo/ and asserts each supplied finding has a visible move recommendation"
-  },
-  {
-    "id": "manual-regions",
-    "claim": "Lets you mark protected regions with mouse or keyboard",
-    "where": "landing page, checker review",
-    "test": "npm run test:e2e -- --grep @claim:manual-regions",
-    "sandbox": "fresh browser context scans shipped local files, focuses the overlay, adds a keyboard region, and observes the finding count"
+    "sandbox": "fresh /?demo=1 download; assert CSV header and exactly two alert rows"
   },
   {
     "id": "json-project-report",
-    "claim": "Studio exports a JSON project report after a valid one-time license check",
-    "where": "Studio section, checker",
+    "claim": "The sample review exports a free JSON project report",
+    "where": "checker, landing page, Terms, README",
     "test": "npm run test:e2e -- --grep @claim:json-project-report",
-    "sandbox": "fresh browser context stubs a valid Sociobot license response, scans shipped local files, and downloads a readable JSON report"
+    "sandbox": "fresh /?demo=1 download without license state; parse the report and assert two alerts"
+  },
+  {
+    "id": "caption-formats",
+    "claim": "The checker reads SRT and positioned WebVTT captions",
+    "where": "landing page, checker, README",
+    "test": "npm run test:e2e -- --grep @claim:caption-formats",
+    "sandbox": "scan the shipped video with SRT and positioned WebVTT fixtures and observe both captions checked"
+  },
+  {
+    "id": "unicode-captions",
+    "claim": "Unicode caption text remains intact in alerts and exports",
+    "where": "shipped demo, README",
+    "test": "npm run test:e2e -- --grep @claim:unicode-captions",
+    "sandbox": "open the shipped Arabic and Japanese demo; assert visible text and byte-for-byte text in CSV"
+  },
+  {
+    "id": "local-detection",
+    "claim": "The checker flags possible face and visually busy overlap on the device",
+    "where": "landing page, README",
+    "test": "npm run test:e2e -- --grep @claim:local-detection",
+    "sandbox": "scan labelled portrait and dense-video fixtures from clean pages and observe one alert for each, repeated in the full suite"
+  },
+  {
+    "id": "safe-zone-recommendations",
+    "claim": "Each sample alert includes a safer caption position",
+    "where": "landing page, demo review, README",
+    "test": "npm run test:e2e -- --grep @claim:safe-zone-recommendations",
+    "sandbox": "fresh /?demo=1 asserts every rendered alert has a move recommendation"
+  },
+  {
+    "id": "manual-regions",
+    "claim": "A protected region can be marked with a pointer or keyboard",
+    "where": "landing page, checker, README",
+    "test": "npm run test:e2e -- --grep @claim:manual-regions",
+    "sandbox": "fresh checker adds one region with keyboard controls and another with a pointer drag"
+  },
+  {
+    "id": "release-cache",
+    "claim": "The download page stores recent GitHub release data to reduce requests",
+    "where": "privacy policy",
+    "test": "npm test -- --testNamePattern @claim:release-cache",
+    "sandbox": "controlled clock and in-memory storage; two loads make one GitHub API request and reuse the stored response"
+  },
+  {
+    "id": "release-fallback",
+    "claim": "If release data is unavailable, the page links to GitHub Releases without a console error",
+    "where": "README, download page",
+    "test": "npm run test:e2e -- --grep @claim:release-fallback",
+    "sandbox": "block and separately return an empty GitHub release response; assert release links and zero console errors"
+  },
+  {
+    "id": "platform-selection",
+    "claim": "The download page selects a matching operating system and architecture when available",
+    "where": "download page, README",
+    "test": "npm test -- --testNamePattern @claim:platform-selection",
+    "sandbox": "controlled macOS, Windows, and Linux release assets across x64 and ARM64; assert only compatible packages are selected"
   },
   {
     "id": "desktop-downloads",
-    "claim": "Offers macOS, Windows, and Linux desktop downloads with published checksums",
-    "where": "download section, README",
-    "test": "npm run test:e2e -- --grep @claim:desktop-downloads",
-    "sandbox": "fresh browser context checks each platform link and the checksum status message from the shipped landing page"
+    "claim": "Current releases provide macOS, Windows, and Linux builds with published checksums",
+    "where": "download page, README",
+    "test": "npm test -- --testNamePattern @claim:desktop-downloads",
+    "sandbox": "GitHub latest release; resolve every supported platform and architecture, HEAD each asset, compare manifest hashes, and hash one downloaded installer"
+  },
+  {
+    "id": "installer-checksum",
+    "claim": "Terminal installers compare downloads with their published SHA-256 values",
+    "where": "README, installer scripts",
+    "test": "npm test -- --testNamePattern @claim:installer-checksum",
+    "sandbox": "temporary fake release and download tools; prove the shell installer accepts a match and rejects a mismatch; inspect the PowerShell mismatch guard"
+  },
+  {
+    "id": "unsigned-builds",
+    "claim": "Current desktop builds have no publisher signature",
+    "where": "download page, README",
+    "test": "npm test -- --testNamePattern @claim:unsigned-builds",
+    "sandbox": "latest Windows installer and release workflow; assert an empty PE certificate directory and no signing configuration"
+  },
+  {
+    "id": "benchmark-corpus",
+    "claim": "The automated benchmark uses a labelled 30-video set",
+    "where": "README",
+    "test": "npm test -- --testNamePattern @claim:benchmark-corpus",
+    "sandbox": "repository fixtures; assert 30 unique encoded videos, critical/control labels, ten-minute metadata, and multiple languages"
+  },
+  {
+    "id": "mit-license",
+    "claim": "The software is licensed under MIT",
+    "where": "README, LICENSE",
+    "test": "npm test -- --testNamePattern @claim:mit-license",
+    "sandbox": "fresh repository checkout; assert LICENSE contains the canonical MIT grant and package metadata names MIT"
   }
 ]

@@ -1,5 +1,5 @@
-const CACHE = "caption-placement-check-v8";
-const SHELL = ["/", "/privacy/", "/terms/", "/assets/hero-projection-room.webp", "/demo/sample.webm", "/demo/sample.srt"];
+const CACHE = "caption-placement-check-v9";
+const SHELL = ["/", "/privacy/", "/terms/", "/404.html", "/icon.svg", "/apple-touch-icon.png", "/assets/hero-projection-room.webp", "/demo/sample.webm", "/demo/sample.srt"];
 
 // Cache Storage exposes a decoded body for compressed development and hosting
 // responses. Keeping Content-Encoding on that decoded body makes Chromium try

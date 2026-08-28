@@ -1,0 +1,1 @@
+Check captions against video frames before they hide speakers, slides, interpreters, or text.

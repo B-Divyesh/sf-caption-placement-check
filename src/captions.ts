@@ -71,7 +71,7 @@ export function parseCaptions(input: string): CaptionCue[] {
     });
   }
 
-  if (!cues.length) throw new Error("No timed cues were found. Choose a valid .srt or .vtt file.");
+  if (!cues.length) throw new Error("No timed captions were found. Choose a valid SRT or WebVTT file.");
   return cues.sort((a, b) => a.start - b.start);
 }
 
@@ -100,8 +100,8 @@ export function recommendZone(regions: Region[], current: Region): string {
     ...zone,
     score: regions.reduce((sum, region) => sum + intersectionRatio(zone.region, region), 0)
   })).sort((a, b) => a.score - b.score);
-  if (intersectionRatio(ranked[0].region, current) > 0.8) return "Shorten or split this cue to reduce the caption block.";
-  return `Move this cue to ${ranked[0].name} for this interval.`;
+  if (intersectionRatio(ranked[0].region, current) > 0.8) return "Shorten or split this caption to reduce the text block.";
+  return `Move this caption to ${ranked[0].name} for this interval.`;
 }
 
 export function findingToCsv(findings: Finding[]): string {

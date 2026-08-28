@@ -8,7 +8,7 @@ on:
       tag:
         description: Release tag
         required: true
-        default: v0.1.3
+        default: v0.1.4
 
 permissions:
   contents: write
@@ -54,7 +54,7 @@ jobs:
         with:
           tagName: ${{ env.RELEASE_TAG }}
           releaseName: Caption Placement Check ${{ env.RELEASE_TAG }}
-          releaseBody: Local-first caption placement accessibility preflight. Builds are currently unsigned.
+          releaseBody: Check caption placement on local video. These builds have no publisher signature.
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: false

@@ -8,6 +8,18 @@ export const RELEASE_PAGE = "https://github.com/B-Divyesh/sf-caption-placement-c
 export const RELEASE_CACHE_KEY = "cpc:release-metadata:v1";
 export const RELEASE_CACHE_MS = 60 * 60 * 1000;
 
+export function platformFromUserAgent(userAgent: string): Platform {
+  if (/Windows/i.test(userAgent)) return "windows";
+  if (/Macintosh|Mac OS X/i.test(userAgent)) return "mac";
+  return "linux";
+}
+
+export function architectureFromUserAgent(userAgent: string): Architecture | undefined {
+  if (/aarch64|arm64/i.test(userAgent)) return "arm64";
+  if (/Intel Mac OS X|Win64|x86_64|x64|amd64/i.test(userAgent)) return "x64";
+  return undefined;
+}
+
 type CachedRelease = { savedAt: number; release: GitHubRelease };
 type StorageLike = Pick<Storage, "getItem" | "setItem">;
 type FetchLike = (input: string, init?: RequestInit) => Promise<Pick<Response, "ok" | "json">>;

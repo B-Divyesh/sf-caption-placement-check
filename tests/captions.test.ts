@@ -17,7 +17,7 @@ describe("caption parsing", () => {
 
   it("rejects empty, malformed, and backwards cues", () => {
     expect(() => parseCaptions(" ")).toThrow("empty");
-    expect(() => parseCaptions("not captions")).toThrow("No timed cues");
+    expect(() => parseCaptions("not captions")).toThrow("No timed captions");
     expect(() => parseCaptions("1\n00:00:03,000 --> 00:00:02,000\nWrong")).toThrow("ends before");
   });
 

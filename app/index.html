@@ -7,24 +7,28 @@
     <meta name="description" content="Check a local video and caption file for placement conflicts before publishing." />
     <link rel="canonical" href="https://caption-placement-check.sociobot.in/check/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Caption Placement Check — local video preflight" />
+    <meta property="og:title" content="Caption Placement Check — check captions on a video" />
     <meta property="og:description" content="Check local captions against the frame before publishing." />
     <meta property="og:image" content="https://caption-placement-check.sociobot.in/assets/social-projection-room.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Caption Placement Check — check captions on a video" />
+    <meta name="twitter:description" content="Check local captions against the frame before publishing." />
     <meta name="twitter:image" content="https://caption-placement-check.sociobot.in/assets/social-projection-room.png" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
-    <title>Caption Placement Check — local video preflight</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <title>Caption Placement Check — check captions on a video</title>
   </head>
   <body class="app-shell">
-    <header class="app-header">
+    <header class="app-header shared-header">
       <a class="skip-link" href="#main">Skip to checker</a>
       <a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a>
-      <div class="local-badge"><span aria-hidden="true">●</span> Checks media on this device</div>
+      <nav aria-label="Main navigation"><a href="/demo/?demo=1">Demo</a><a href="/check/">Checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav>
     </header>
     <main id="main" class="workspace">
       <section class="workspace-intro" aria-labelledby="app-title">
-        <div><p class="eyebrow">Accessibility preflight · New check</p><h1 id="app-title">Catch captions that cover what matters.</h1><p class="first-run-note">Start with your own exports, or load the included lesson sample to see a complete review.</p></div>
+        <div><p class="eyebrow">Check caption placement on your device</p><h1 id="app-title">Check captions against the video frame.</h1><p class="first-run-note">Choose your own files, or load the lesson sample to see two alerts.</p><div class="local-badge"><span aria-hidden="true">●</span> Checks media on this device</div></div>
         <button class="quiet-button" id="new-check" type="button">New check</button>
       </section>
 
@@ -45,12 +49,12 @@
         <div class="error-banner" id="input-error" role="alert" hidden></div>
         <div class="setup-actions">
           <label class="placement-select" for="placement"><span>Expected caption position</span><select id="placement"><option value="bottom">Bottom center</option><option value="top">Top center</option></select></label>
-          <div class="setup-buttons"><button class="quiet-button" id="load-sample" type="button">Load sample project</button><button class="primary-button" id="start-scan" type="button" disabled>Scan caption cues <span aria-hidden="true">→</span></button></div>
+          <div class="setup-buttons"><button class="quiet-button" id="load-sample" type="button">Load sample project</button><button class="primary-button" id="start-scan" type="button" disabled>Check caption placement <span aria-hidden="true">→</span></button></div>
         </div>
       </section>
 
       <section id="review" class="review" aria-labelledby="review-title" hidden>
-        <div class="section-heading review-heading"><span class="step-number">02</span><div><h2 id="review-title">Review flagged cues</h2><p id="scan-summary">Scanning sampled frames…</p></div><button class="secondary-button" id="export-csv" type="button">Export CSV</button></div>
+        <div class="section-heading review-heading"><span class="step-number">02</span><div><h2 id="review-title">Review alerts</h2><p id="scan-summary">Checking caption frames…</p></div><div class="export-actions"><button class="secondary-button" id="export-csv" type="button">Export alerts as CSV</button><button class="secondary-button" id="export-json" type="button">Export project as JSON</button></div></div>
         <div class="progress-wrap" id="progress-wrap" aria-live="polite"><div class="progress-label"><span id="progress-text">Preparing local scan</span><span id="progress-value">0%</span></div><progress id="scan-progress" max="100" value="0">0%</progress></div>
         <div class="review-bench">
           <div class="viewer-column">
@@ -62,27 +66,20 @@
             <div class="viewer-tools">
               <button class="quiet-button" id="mark-region" type="button" aria-pressed="false">Mark protected region</button>
               <button class="quiet-button" id="save-preset" type="button">Save protected regions</button>
-              <button class="quiet-button studio-only" id="export-json" type="button" disabled>Export JSON · Studio</button>
               <span id="region-help">Add an interpreter, slide, or sign that automation may miss.</span>
             </div>
             <div class="notice"><strong>Advisory check.</strong> Confirm every alert and watch the final video. This does not certify legal or WCAG compliance.</div>
           </div>
           <div class="cue-panel">
-            <div class="cue-toolbar"><div class="filter-group" role="group" aria-label="Filter findings"><button class="filter active" data-filter="open" type="button">Open <span id="open-count">0</span></button><button class="filter" data-filter="all" type="button">All <span id="all-count">0</span></button></div></div>
+            <div class="cue-toolbar"><div class="filter-group" role="group" aria-label="Filter alerts"><button class="filter active" data-filter="open" type="button">Open <span id="open-count">0</span></button><button class="filter" data-filter="all" type="button">All <span id="all-count">0</span></button></div></div>
             <ol id="findings" class="findings"></ol>
             <div id="no-findings" class="empty-review" hidden><span aria-hidden="true">✓</span><h3>No overlaps found in sampled frames</h3><p>Still watch the full export—automated checks can miss motion, stylized text, and non-frontal faces.</p></div>
           </div>
         </div>
       </section>
 
-      <section class="studio-panel" aria-labelledby="studio-title">
-        <div><p class="eyebrow">Optional one-time unlock</p><h2 id="studio-title">Keep repeat productions consistent</h2><p>Studio adds JSON project reports. Core scanning, recommendations, saved regions, and CSV export stay free.</p></div>
-        <div class="studio-actions"><span class="price">$19 <small>once</small></span><a class="primary-button" href="https://api.sociobot.in/api/v1/products/caption-placement-check/checkout" id="buy-link">Buy Studio</a><button class="text-button" id="restore-license" type="button">Restore a license</button></div>
-        <form id="license-form" class="license-form" hidden><label for="license-token">License token</label><div><input id="license-token" autocomplete="off" spellcheck="false" /><button class="secondary-button" type="submit">Verify license</button></div><p id="license-status" role="status"></p></form>
-      </section>
-
     </main>
-    <footer class="app-footer"><span>Made for careful publishing.</span><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav><small>Built by Param Factory · v0.1.3</small></footer>
+    <footer class="app-footer shared-footer"><div><a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a><p>Check caption placement before publishing.</p></div><nav aria-label="Footer"><a href="/demo/?demo=1">Demo</a><a href="/check/">Checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav><small>Built by Param Factory · v0.1.4</small></footer>
     <script type="module" src="../src/app.ts"></script>
   </body>
 </html>

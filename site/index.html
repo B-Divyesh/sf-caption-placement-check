@@ -13,26 +13,28 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Caption Placement Check — check caption placement" />
+    <meta name="twitter:description" content="Check captions against the frame before publishing." />
     <meta name="twitter:image" content="https://caption-placement-check.sociobot.in/assets/social-projection-room.png" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <title>Caption Placement Check — check caption placement</title>
   </head>
   <body class="landing">
-    <header class="site-header">
+    <header class="site-header shared-header">
       <a class="skip-link" href="#main">Skip to content</a>
       <a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a>
-      <nav aria-label="Main navigation"><a href="/demo/">Demo</a><a href="#how">How it works</a><a class="header-download" href="#download">Download</a></nav>
+      <nav aria-label="Main navigation"><a href="/demo/?demo=1">Demo</a><a href="/check/">Checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav>
     </header>
     <main id="main">
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Local accessibility preflight</p>
-          <h1>Find captions that hide important video.</h1>
+          <p class="eyebrow">Check caption placement on your device</p>
+          <h1>Check captions before they hide the video.</h1>
           <p class="hero-lead">For educators and creators who need a careful caption check before publishing.</p>
-          <div class="hero-actions"><a class="primary-button" href="/demo/">Try it with sample data <span aria-hidden="true">→</span></a><a class="quiet-button" href="/check/">Check your own files</a></div>
-          <p class="action-note">Opens a short sample review with two caption cues.</p>
-          <ul class="plain-facts"><li>Runs on your device</li><li>No account required</li><li>Free core check</li></ul>
+          <div class="hero-actions"><a class="primary-button" href="/demo/?demo=1">Try it with sample data <span aria-hidden="true">→</span></a><a class="quiet-button" href="/check/">Check your own files</a></div>
+          <p class="action-note">Opens a sample review with two alerts.</p>
+          <ul class="plain-facts"><li>Runs on your device</li><li>No account required</li><li>CSV and JSON exports are free</li></ul>
         </div>
         <figure class="hero-scene">
           <img src="/assets/hero-projection-room.webp" width="1200" height="800" alt="An empty lecture theatre with a presenter silhouette and slide projected above a clear lower caption zone" fetchpriority="high" decoding="async" />
@@ -43,52 +45,47 @@
       <section class="proof-strip" aria-label="Product capabilities">
         <p><strong>Local by design</strong><span>Checks media on your device</span></p>
         <p><strong>SRT + WebVTT</strong><span>Review final caption exports</span></p>
-        <p><strong>Human in the loop</strong><span>Advisory findings you confirm</span></p>
+        <p><strong>Human in the loop</strong><span>Advisory alerts you confirm</span></p>
       </section>
 
       <section id="how" class="how-section">
-        <div class="section-kicker"><p class="eyebrow">The preflight bench</p><h2>One focused pass before release</h2><p>Caption tools make words. This check keeps those words from hiding the image.</p></div>
+        <div class="section-kicker"><p class="eyebrow">How caption checking works</p><h2>Check placement before publishing</h2><p>Caption tools make words. This check keeps those words from hiding the image.</p></div>
         <ol class="process">
           <li><span class="process-number">01</span><div><h3>Pair the final exports</h3><p>Drop in the video and its SRT or WebVTT file. The checker processes them locally.</p></div></li>
-          <li><span class="process-number">02</span><div><h3>Sample every cue</h3><p>The checker seeks into each timed cue and looks for face or dense visual overlap.</p></div></li>
-          <li><span class="process-number">03</span><div><h3>Make the call</h3><p>Review exact timecodes, compare a safer position, mark protected regions, and export the list.</p></div></li>
+          <li><span class="process-number">02</span><div><h3>Check each caption</h3><p>The checker samples each caption and looks for faces or visually busy areas.</p></div></li>
+          <li><span class="process-number">03</span><div><h3>Review and export alerts</h3><p>Check each time, compare a safer position, mark protected regions, and export the alerts.</p></div></li>
         </ol>
       </section>
 
       <section class="frame-demo" aria-labelledby="frame-demo-title">
         <div class="demo-screen" aria-hidden="true"><div class="demo-slide"><span></span><span></span><span></span></div><div class="demo-person"></div><div class="demo-caption">A caption should support the frame,<br />not hide it.</div><div class="demo-warning">Overlap area</div></div>
-        <div><p class="eyebrow">Visible, explainable alerts</p><h2 id="frame-demo-title">A warning you can inspect—not a magic score.</h2><p>The review shows which region triggered an alert, the cue’s exact time, and a suggested alternate zone. Add your own protected area for an interpreter or sign the automated pass may miss.</p><ul class="tick-list"><li>Face detection when the system supports it</li><li>Script-agnostic visual density heuristic</li><li>Free CSV export for an editor or client</li></ul></div>
+        <div><p class="eyebrow">Visible, explainable alerts</p><h2 id="frame-demo-title">Inspect every alert before you act.</h2><p>The review shows the overlapping region, exact time, and a safer position. Add a protected region for content the check may miss.</p><ul class="tick-list"><li>Checks faces when the system supports it</li><li>Checks visually busy areas</li><li>Exports alerts as CSV or JSON</li></ul></div>
       </section>
 
       <section class="walkthrough" aria-labelledby="walkthrough-title">
-        <div><p class="eyebrow">Desktop walkthrough</p><h2 id="walkthrough-title">See the installed app in four frames.</h2><p>Load the included lesson sample on first run, then inspect the cue list and export the free CSV.</p></div>
+        <div><p class="eyebrow">Desktop walkthrough</p><h2 id="walkthrough-title">See the installed app in four frames.</h2><p>Load the lesson sample, inspect the alert list, and export the free CSV.</p></div>
         <ol class="walkthrough-frames">
           <li><span>01</span><strong>Load the lesson sample</strong><small>Start with a complete local project.</small></li>
-          <li><span>02</span><strong>Scan each caption cue</strong><small>Frames stay on your device.</small></li>
+          <li><span>02</span><strong>Check each caption</strong><small>Frames stay on your device.</small></li>
           <li><span>03</span><strong>Inspect the overlap</strong><small>See the time, region, and next move.</small></li>
           <li><span>04</span><strong>Export the handoff list</strong><small>Send the free CSV to an editor.</small></li>
         </ol>
       </section>
 
       <section id="download" class="download-section" aria-labelledby="download-title">
-        <div><p class="eyebrow">Desktop release 0.1</p><h2 id="download-title">Your footage. Your machine.</h2><p>Install the small desktop app for dependable offline reviews. Builds are unsigned while the project is new; your platform may ask you to confirm opening it.</p></div>
+        <div><p class="eyebrow">Desktop release 0.1</p><h2 id="download-title">Download the offline desktop app</h2><p>The desktop app runs the same local checker. Current builds have no publisher signature, so your platform may ask before opening.</p></div>
         <div class="download-card">
           <span class="platform-label" id="platform-label">Choose your platform</span>
-          <a class="primary-button download-main" id="platform-download" href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest">View latest downloads</a>
-          <div class="platform-links"><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="mac">macOS</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="windows">Windows</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="linux">Linux</a></div>
+          <a class="primary-button download-main" id="platform-download" href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" aria-label="View latest downloads on GitHub (external)">View latest downloads <span class="external-note">on GitHub ↗</span></a>
+          <div class="platform-links"><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="mac" aria-label="macOS downloads on GitHub (external)">macOS ↗</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="windows" aria-label="Windows downloads on GitHub (external)">Windows ↗</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="linux" aria-label="Linux downloads on GitHub (external)">Linux ↗</a></div>
           <details><summary>Install from a terminal</summary><code id="install-command">curl -fsSL https://caption-placement-check.sociobot.in/install.sh | sh</code><button class="copy-button" data-copy="#install-command" type="button">Copy command</button></details>
           <p id="release-status" class="release-status" role="status">Checking published downloads…</p>
         </div>
       </section>
 
-      <section id="studio" class="pricing-section" aria-labelledby="pricing-title">
-        <div><p class="eyebrow">Optional Studio license</p><h2 id="pricing-title">Repeatable reviews, one payment.</h2><p>The complete check stays free. Studio is for teams and creators who keep structured project reports.</p></div>
-        <div class="price-card"><p class="price">$19 <small>one time</small></p><ul><li>JSON project reports</li><li>License restore on your devices</li><li>Free scanner remains complete</li></ul><a class="primary-button" href="https://api.sociobot.in/api/v1/products/caption-placement-check/checkout">Buy Studio</a><p class="merchant-copy">Hosted checkout. Sociobot/Dodo is the merchant of record.</p></div>
-      </section>
-
-      <section class="honesty"><h2>Built for a better review, not a compliance badge.</h2><p>Detection is advisory. Watch the final export with captions enabled. Include people who use captions in review when possible. Check your publishing platform’s caption rendering.</p></section>
+      <section class="honesty"><h2>What this check cannot decide</h2><p>Alerts are advisory. Watch the final export with captions enabled. Include people who use captions in review when possible. Check your publishing platform’s caption rendering.</p></section>
     </main>
-    <footer class="site-footer"><div><a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a><p>Original generated environmental artwork. No tracking. Checks media on your device.</p></div><nav aria-label="Footer"><a href="/demo/">Demo</a><a href="/check/">Browser checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check">Source</a></nav><small>Built by Param Factory · v0.1.3</small></footer>
+    <footer class="site-footer shared-footer"><div><a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a><p>Check caption placement before publishing.</p></div><nav aria-label="Footer"><a href="/demo/?demo=1">Demo</a><a href="/check/">Checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav><small>Built by Param Factory · v0.1.4</small></footer>
     <script type="module" src="../src/site.ts"></script>
   </body>
 </html>

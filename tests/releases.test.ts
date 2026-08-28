@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { assetForPlatform, loadReleaseMetadata, RELEASE_API, RELEASE_CACHE_KEY } from "../src/releases";
+import { architectureFromUserAgent, assetForPlatform, loadReleaseMetadata, platformFromUserAgent, RELEASE_API, RELEASE_CACHE_KEY } from "../src/releases";
 
 const release = {
   tag_name: "v0.1.0",
@@ -26,24 +26,30 @@ describe("GitHub release metadata", () => {
     expect(JSON.parse(storage.getItem(RELEASE_CACHE_KEY)!)).toMatchObject({ savedAt: 1_000, release });
   });
 
-  it("@regression:github-api uses fresh cached metadata without another browser request", async () => {
-    const storage = memoryStorage({ [RELEASE_CACHE_KEY]: JSON.stringify({ savedAt: 1_000, release }) });
-    const fetcher = vi.fn();
+  it("@claim:release-cache stores and reuses fresh release data", async () => {
+    const storage = memoryStorage();
+    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => release });
     await expect(loadReleaseMetadata(fetcher, storage, 1_001)).resolves.toEqual(release);
-    expect(fetcher).not.toHaveBeenCalled();
+    await expect(loadReleaseMetadata(fetcher, storage, 2_000)).resolves.toEqual(release);
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
-  it("@regression:github-api turns a missing release or network failure into an empty state", async () => {
+  it("turns a missing release or network failure into an empty state", async () => {
     const storage = memoryStorage();
     await expect(loadReleaseMetadata(vi.fn().mockRejectedValue(new Error("CORS blocked")), storage)).resolves.toBeUndefined();
     await expect(loadReleaseMetadata(vi.fn().mockResolvedValue({ ok: false }), storage)).resolves.toBeUndefined();
   });
 
-  it("@regression:architecture never chooses an incompatible desktop package", () => {
+  it("@claim:platform-selection chooses only compatible operating-system and architecture packages", () => {
     expect(assetForPlatform(release, "mac", "x64")?.name).toBe("CaptionPlacementCheck_x64.dmg");
     expect(assetForPlatform(release, "mac", "arm64")?.name).toBe("CaptionPlacementCheck_aarch64.dmg");
     expect(assetForPlatform(release, "windows", "x64")?.name).toMatch(/\.msi$/);
     expect(assetForPlatform(release, "linux", "x64")?.name).toMatch(/amd64\.AppImage$/);
     expect(assetForPlatform(release, "linux", "arm64")).toBeUndefined();
+    expect(platformFromUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).toBe("windows");
+    expect(platformFromUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)")).toBe("mac");
+    expect(platformFromUserAgent("Mozilla/5.0 (X11; Linux x86_64)")).toBe("linux");
+    expect(architectureFromUserAgent("Windows NT 10.0; Win64; x64")).toBe("x64");
+    expect(architectureFromUserAgent("Macintosh; arm64 Mac OS X")).toBe("arm64");
   });
 });

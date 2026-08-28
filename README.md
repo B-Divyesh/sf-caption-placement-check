@@ -1,25 +1,26 @@
 # Caption Placement Check
 
-Caption Placement Check is a local-first accessibility preflight for solo educators, creators, and small publishing teams. Pair a final video with SRT or WebVTT captions; the app samples each timed cue, flags overlap with faces and visually dense regions, recommends an alternate zone, and produces a review list.
+Check caption placement on a video before publishing. The app flags captions that overlap faces, text, or a region you mark.
 
-It is intentionally not a transcription tool or compliance certificate. A human should watch the final export.
+It suggests a safer position and builds a list of alerts. It does not transcribe video or certify legal compliance.
 
-Live site and browser checker: <https://caption-placement-check.sociobot.in>
+Live product: <https://caption-placement-check.sociobot.in>
 
-Try the isolated sample review in one click: <https://caption-placement-check.sociobot.in/demo/>. It loads a shipped two-cue lesson sample and does not save demo data.
+Try the isolated sample: <https://caption-placement-check.sociobot.in/?demo=1>. It opens two alerts and does not read or save your checker data.
 
 ## What it does
 
-- Processes video and caption files in local app memory.
-- Parses SRT and WebVTT, including cue position settings and non-Latin text.
-- Uses an available platform face detector, a conservative local fallback, and a visual-density heuristic as advisory signals.
-- Lets a reviewer draw protected regions for interpreters, slides, signs, or other meaningful content.
-- Exports the review list as CSV for free.
-- Saves protected-region presets in the browser when you choose. Studio exports JSON project reports for a $19 one-time license.
+- Processes chosen video and caption files on your device.
+- Reads SRT and WebVTT files, including positioned captions.
+- Keeps Arabic, Japanese, and other Unicode caption text in alerts and exports.
+- Checks for faces and visually busy regions.
+- Lets you mark protected regions with a pointer or keyboard.
+- Suggests a safer caption position for each alert.
+- Exports alerts as CSV and project details as JSON without an account.
 
 ## Run locally
 
-Requirements: Node.js 22+, npm, and—for the desktop shell—Rust plus the [Tauri 2 system dependencies](https://v2.tauri.app/start/prerequisites/).
+Install Node.js 22+, npm, Rust, and the [Tauri 2 system dependencies](https://v2.tauri.app/start/prerequisites/) (external).
 
 ```sh
 npm ci
@@ -31,20 +32,20 @@ npm run tauri dev    # native desktop window
 ## Test and build
 
 ```sh
-npm test             # parser and placement unit tests
-npm run test:e2e     # production-site, axe, keyboard, mobile, and local scan tests
-npm run check        # TypeScript plus Rust checks
-npm run build        # exact static deploy output: dist/site/index.html
-npm run tauri build  # native bundle for the current platform
+npm test
+npm run test:e2e
+npm run test:benchmark
+npm run check
+npm run build
 ```
 
-The release workflow is the source of platform binaries. Tag `v*` or dispatch `.github/workflows/release.yml`; GitHub Actions builds macOS arm64/x64, Windows x64, and Linux x64 bundles and publishes `SHA256SUMS` plus `latest.json`.
-
-The landing page reads release metadata from the CORS-enabled GitHub Releases API and caches a successful result for one hour. If GitHub has no release or cannot be reached, it calmly links to the Releases page instead of failing in the browser console.
+`npm run build` creates the static deployment in `dist/site/`. The Tauri workflow builds the desktop packages from tags named `v*`.
 
 ## Install
 
-The landing page detects the operating system and only selects a matching architecture when the browser provides one. Otherwise it opens the release choices. Terminal installers download and verify SHA-256 before opening/installing a matching asset:
+The download page selects the matching operating system and architecture when the browser provides them. If release data is unavailable, it links to GitHub Releases.
+
+Current releases provide macOS, Windows, and Linux builds with published checksums. The terminal installers compare every download with its SHA-256 value.
 
 ```sh
 curl -fsSL https://caption-placement-check.sociobot.in/install.sh | sh
@@ -54,18 +55,18 @@ curl -fsSL https://caption-placement-check.sociobot.in/install.sh | sh
 irm https://caption-placement-check.sociobot.in/install.ps1 | iex
 ```
 
-Early desktop builds are unsigned. On macOS, right-click the app and choose **Open**. On Windows, review the SmartScreen prompt before continuing.
+Current builds have no publisher signature. On macOS, right-click the app and choose **Open**. On Windows, review the SmartScreen prompt.
 
-## Privacy and architecture
+## Privacy
 
-The app has no telemetry or advertising analytics and uses no runtime CDN resources. Chosen media is processed locally. Saved protected regions stay in browser storage until you clear site data; demo mode saves nothing. See [`site/privacy/index.html`](site/privacy/index.html) and [`site/terms/index.html`](site/terms/index.html).
+The checker does not upload chosen media. Saved protected regions stay in browser storage until you clear site data.
 
-## Studio license
+The demo does not read or change saved regions or other real-data keys. The public site uses no advertising or behavioral analytics.
 
-The scanner, recommendations, manual regions, saved regions, and CSV export are free. Studio is a $19 one-time license for JSON project reports. Checkout and license verification use Sociobot/Dodo. A license token is stored only in browser storage and checked at most once daily; the free checker never waits for that check. Use **Restore a license** in the checker to move Studio to another device.
+See [Privacy](site/privacy/index.html) and [Terms](site/terms/index.html).
 
-## Benchmark
+## Validation and source license
 
-Run `npm run test:benchmark` for the labelled 30-video placement regression corpus. It decodes each shipped ten-minute WebM fixture through the browser scanner and guards the brief threshold without making a public accuracy promise. See [`.factory/benchmark.md`](.factory/benchmark.md).
+The automated benchmark uses the labelled 30-video set documented in [`.factory/benchmark.md`](.factory/benchmark.md). Detection remains advisory; watch the final export.
 
-The visual rationale, asset prompt, and provenance are documented in [`.factory/design.md`](.factory/design.md). The software is MIT licensed.
+The visual rationale and asset provenance are in [`.factory/design.md`](.factory/design.md). The software uses the MIT license in [LICENSE](LICENSE).

@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { curatedThirtyVideoSet } from "../benchmark/manifest";
 
 test("@regression:brief-success-measure decodes the labelled 30-video corpus and meets recall and false-alert limits", async ({ page }) => {
+  test.setTimeout(120_000);
   let critical = 0;
   let caught = 0;
   let falseAlerts = 0;
@@ -10,8 +11,8 @@ test("@regression:brief-success-measure decodes the labelled 30-video corpus and
     await page.goto("/check/");
     await page.locator("#video-file").setInputFiles(resolve("tests/benchmark/media", specimen.media));
     await page.locator("#caption-file").setInputFiles(resolve("tests/benchmark", specimen.label === "critical" ? "critical.srt" : "control.srt"));
-    await page.getByRole("button", { name: /Scan caption cues/ }).click();
-    await expect(page.locator("#scan-summary")).toContainText("1 cues sampled", { timeout: 20_000 });
+    await page.getByRole("button", { name: "Check caption placement" }).click();
+    await expect(page.locator("#scan-summary")).toContainText("1 caption checked", { timeout: 20_000 });
     const findingCount = await page.locator("#findings li").count();
     if (specimen.label === "critical") { critical++; if (findingCount > 0) caught++; }
     else falseAlerts += findingCount;

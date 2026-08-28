@@ -1,4 +1,5 @@
 import "./styles.css";
+import "./shell";
 import {
   captionRegion, findingToCsv, formatTime, intersectionRatio, parseCaptions, recommendZone,
   type CaptionCue, type Finding, type FindingKind, type Region
@@ -24,6 +25,7 @@ if (isDemo) {
   document.title = "Demo — Caption Placement Check";
   document.querySelector('link[rel="canonical"]')?.setAttribute("href", "https://caption-placement-check.sociobot.in/demo/");
   document.querySelector('meta[property="og:title"]')?.setAttribute("content", "Demo — Caption Placement Check");
+  document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", "Demo — Caption Placement Check");
 }
 
 let videoFile: File | null = null;
@@ -83,9 +85,17 @@ for (const [id, kind] of [["#video-drop", "video"], ["#caption-drop", "caption"]
 
 function waitFor(target: EventTarget, event: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const timeout = window.setTimeout(() => reject(new Error(`Video did not respond while waiting for ${event}.`)), 12000);
-    target.addEventListener(event, () => { window.clearTimeout(timeout); resolve(); }, { once: true });
+    const done = () => { window.clearTimeout(timeout); resolve(); };
+    const timeout = window.setTimeout(() => {
+      target.removeEventListener(event, done);
+      reject(new Error(`Video did not respond while waiting for ${event}.`));
+    }, 12000);
+    target.addEventListener(event, done, { once: true });
   });
+}
+
+async function waitForDecodedFrame() {
+  await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 }
 
 async function loadInputs() {
@@ -112,9 +122,15 @@ async function loadInputs() {
 startButton.addEventListener("click", loadInputs);
 
 function seek(time: number): Promise<void> {
-  if (Math.abs(video.currentTime - time) < 0.04 && video.readyState >= 2) return Promise.resolve();
-  video.currentTime = Math.min(Math.max(0, time), Math.max(0, video.duration - 0.05));
-  return waitFor(video, "seeked");
+  return (async () => {
+    const target = Math.min(Math.max(0, time), Math.max(0, video.duration - 0.05));
+    if (Math.abs(video.currentTime - target) >= 0.04 || video.readyState < 2) {
+      const ready = waitFor(video, "seeked");
+      video.currentTime = target;
+      await ready;
+    }
+    await waitForDecodedFrame();
+  })();
 }
 
 function denseRegions(canvas: HTMLCanvasElement): Region[] {
@@ -176,7 +192,7 @@ async function scanVideo() {
     const percent = Math.round(((index + 1) / total) * 100);
     ($("#scan-progress") as HTMLProgressElement).value = percent;
     $("#progress-value").textContent = `${percent}%`;
-    $("#progress-text").textContent = `Sampling cue ${index + 1} of ${total}`;
+    $("#progress-text").textContent = `Checking caption ${index + 1} of ${total}`;
     if (index % 4 === 0) renderFindings();
     await new Promise((resolve) => requestAnimationFrame(resolve));
   }
@@ -188,7 +204,7 @@ async function scanVideo() {
 }
 
 function updateScanSummary() {
-  $("#scan-summary").textContent = `${cues.length} cues sampled · ${findings.length} ${findings.length === 1 ? "cue needs" : "cues need"} a closer look`;
+  $("#scan-summary").textContent = `${cues.length} ${cues.length === 1 ? "caption" : "captions"} checked · ${findings.length} ${findings.length === 1 ? "alert needs" : "alerts need"} review`;
 }
 
 function reasonLabel(kind: FindingKind) {
@@ -348,48 +364,8 @@ function download(name: string, type: string, value: string) {
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
-$("#export-csv").addEventListener("click", () => download("caption-placement-findings.csv", "text/csv", findingToCsv(findings)));
+$("#export-csv").addEventListener("click", () => download("caption-placement-alerts.csv", "text/csv", findingToCsv(findings)));
 $("#new-check").addEventListener("click", () => { scanCancelled = true; location.href = isDemo ? "/demo/" : "/check/"; });
-
-const LICENSE_KEY = "sb_license:caption-placement-check";
-const VERDICT_KEY = `${LICENSE_KEY}:verdict`;
-const BILLING_API = "https://api.sociobot.in/api/v1/products/caption-placement-check";
-
-function setStudio(active: boolean, message: string) {
-  document.body.classList.toggle("studio-unlocked", active);
-  document.querySelectorAll<HTMLButtonElement>(".studio-only").forEach((button) => { button.disabled = !active; });
-  const licenseStatus = document.querySelector("#license-status");
-  if (licenseStatus) licenseStatus.textContent = message;
-  const buy = document.querySelector<HTMLAnchorElement>("#buy-link");
-  if (active && buy) buy.textContent = "Studio unlocked";
-}
-
-async function verifyLicense(token: string, force = false) {
-  const cached = JSON.parse(localStorage.getItem(VERDICT_KEY) || "null") as { valid?: boolean; checked?: number } | null;
-  if (!force && cached?.valid && cached.checked && Date.now() - cached.checked < 86_400_000) { setStudio(true, "Studio is active on this device."); return; }
-  if (cached?.valid) setStudio(true, "Studio is active; checking the license in the background…");
-  if (!navigator.onLine) { setStudio(Boolean(cached?.valid), cached?.valid ? "Studio is active from the last check. You are offline." : "Connect once to verify a Studio license."); return; }
-  try {
-    const response = await fetch(`${BILLING_API}/verify?license=${encodeURIComponent(token)}`);
-    if (!response.ok) throw new Error("Verification service unavailable");
-    const result = await response.json() as { valid: boolean };
-    localStorage.setItem(VERDICT_KEY, JSON.stringify({ valid: result.valid, checked: Date.now() }));
-    setStudio(result.valid, result.valid ? "Studio is active on this device." : "This license is no longer active. Buy or restore another license.");
-  } catch { setStudio(Boolean(cached?.valid), "Could not reach license verification. The free checker is still available."); }
-}
-
-const queryLicense = new URLSearchParams(location.search).get("license");
-if (queryLicense) { localStorage.setItem(LICENSE_KEY, queryLicense); history.replaceState({}, "", location.pathname + location.hash); }
-const savedLicense = queryLicense || localStorage.getItem(LICENSE_KEY);
-if (savedLicense) void verifyLicense(savedLicense);
-
-document.querySelector("#restore-license")?.addEventListener("click", () => { $("#license-form").hidden = false; ($("#license-token") as HTMLInputElement).focus(); });
-document.querySelector("#license-form")?.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const token = ($("#license-token") as HTMLInputElement).value.trim();
-  if (!token) { $("#license-status").textContent = "Paste the license token from your receipt."; return; }
-  localStorage.setItem(LICENSE_KEY, token); void verifyLicense(token, true);
-});
 
 $("#save-preset").addEventListener("click", () => {
   if (isDemo) { $("#region-help").textContent = "Demo changes are kept only for this sample review."; return; }
@@ -426,9 +402,9 @@ async function startDemo() {
   const banner = document.createElement("aside");
   banner.className = "demo-banner";
   banner.setAttribute("aria-label", "Demo mode");
-  banner.innerHTML = "<strong>Demo — sample data, nothing is saved</strong><span>Two short caption cues are ready to inspect.</span><button type=\"button\">Reset demo</button><a href=\"/check/\">Start for real</a>";
+  banner.innerHTML = "<strong>Demo — sample data, nothing is saved</strong><span>Two caption alerts are ready to inspect.</span><button type=\"button\">Reset demo</button><a href=\"/check/\">Start for real</a>";
   document.body.prepend(banner);
-  banner.querySelector("button")!.addEventListener("click", () => { location.href = "/demo/"; });
+  banner.querySelector("button")!.addEventListener("click", () => { location.href = "/demo/?demo=1"; });
   try {
     await loadSampleProject();
   } catch {
