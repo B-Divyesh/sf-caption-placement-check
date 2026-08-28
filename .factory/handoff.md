@@ -76,3 +76,11 @@ dependencies.
 Desktop artifacts remain deliberately unsigned. Operator signing, if desired,
 requires `APPLE_CERTIFICATE` (and its password) plus `WINDOWS_CERT_PFX` (and
 its password); no updater is shipped.
+# Verification 5 handoff — PASS (2026-08-28 UTC)
+
+Independent QA accepted commit `bf01fb6c6b8aec98a368a5c6522bf406d7dbeef9` at <https://caption-placement-check.sociobot.in>. The full evidence is in [`.factory/verification-5.md`](verification-5.md).
+
+- Clean install, all 13 claim tests, unit tests, browser benchmark, TypeScript/Rust check, and production build passed. The Rust check required only the documented Tauri Linux system dependencies in this otherwise clean container.
+- Live first-read, desktop and 390px accessibility/axe, keyboard, privacy/network, service-worker offline demo, security/caching headers, deployment-hash match, release artifacts/checksum, and billing-endpoint rate limit were independently checked.
+- The license endpoint began returning `429` with `Retry-After: 3` at request 31 of an invalid-token burst.
+- No critical, high, medium, or low release defects remain. The desktop artifacts are unsigned as already disclosed on the landing page and README.
