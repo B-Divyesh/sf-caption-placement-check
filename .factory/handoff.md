@@ -50,6 +50,13 @@ npm audit --omit=dev
 - `npm run check`, static production build, installer syntax, and production
   dependency audit passed locally. Built landing assets remain below the
   static JS/CSS budget; no third-party runtime scripts or fonts are used.
+- Deployed `dist/site/` with `swa deploy dist/site --env production
+  --resource-group sociobot --app-name sf-caption-placement-check
+  --no-use-keychain`. Live root includes the new social asset and honest
+  Studio state; `/does-not-exist` now returns HTTP 404.
+- Pushed repair commit `60a5c246ce283358696b00cdb7c1dff041b93ea9` and tag
+  `v0.1.1`. GitHub Actions release run `33168511430` is building replacement
+  desktop artifacts from that exact commit.
 
 ### Remaining operator action
 
