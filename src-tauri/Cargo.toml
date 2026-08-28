@@ -1,6 +1,6 @@
 [package]
 name = "caption-placement-check"
-version = "0.1.0"
+version = "0.1.2"
 description = "Local caption placement accessibility preflight"
 authors = ["Sociobot"]
 license = "MIT"

@@ -1,4 +1,4 @@
-const CACHE = "caption-placement-check-v4";
+const CACHE = "caption-placement-check-v6";
 const SHELL = ["/", "/check/", "/demo/", "/privacy/", "/terms/", "/assets/hero-projection-room.webp", "/demo/sample.webm", "/demo/sample.srt"];
 async function cacheAppShell(cache, route) {
   const response = await fetch(route, { cache: "reload" });
@@ -27,5 +27,12 @@ self.addEventListener("fetch", (event) => {
       if (response.ok && sameOrigin) caches.open(CACHE).then((cache) => cache.put(event.request, response.clone()));
       return response;
     });
-  }).catch(() => event.request.mode === "navigate" ? caches.match("/") : Response.error()));
+  }).catch(async () => {
+    if (event.request.mode !== "navigate") return Response.error();
+    // Navigation requests can carry browser-added headers that prevent a
+    // direct Request match. Match the precached pathname before falling back
+    // to the landing shell so an offline /demo/ reload stays in demo mode.
+    const route = new URL(event.request.url).pathname;
+    return await caches.match(route) || await caches.match("/");
+  }));
 });

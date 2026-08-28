@@ -8,6 +8,6 @@ Checked 2026-08-28. The first-screen headline is 6 words: “Find captions that 
 | Review warning | alert |
 | Protected part of a frame | protected region |
 | Trial workspace | demo |
-| Optional paid tier | Studio |
+| Saved frame area | protected region |
 
 The landing’s sentence copy is at most 22 words per sentence. Labels, headings, and short facts are fragments rather than sentences.

@@ -22,18 +22,51 @@ test("@claim:sample-demo opens a useful local sample review without saving data"
   await expect.poll(() => page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith("demo:") || key.startsWith("cpc:") || key.startsWith("sb_license:")).length)).toBe(0);
 });
 
-test("@claim:media-local keeps sample media local and isolates real license state", async ({ page }) => {
+test("@claim:media-local processes selected media without uploads", async ({ page }) => {
+  const requests: Array<{ url: string; method: string; postData: string | null }> = [];
+  page.on("request", (request) => requests.push({ url: request.url(), method: request.method(), postData: request.postData() }));
+  await page.goto("/demo/");
+  await page.getByRole("link", { name: "Start for real" }).click();
+  await page.locator("#video-file").setInputFiles(resolve("tests/fixtures/sample.webm"));
+  await page.locator("#caption-file").setInputFiles(resolve("tests/fixtures/sample.srt"));
+  await page.getByRole("button", { name: /Scan caption cues/ }).click();
+  await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
+  expect(requests.every((request) => new URL(request.url).origin === "http://127.0.0.1:4173")).toBeTruthy();
+  expect(requests.filter((request) => request.method !== "GET" || request.postData).map((request) => request.url)).toEqual([]);
+});
+
+test("@claim:no-account completes a free sample scan and CSV export", async ({ page }) => {
+  await page.goto("/demo/");
+  await expect(page.locator("#findings li")).toHaveCount(2, { timeout: 15_000 });
+  await expect(page.getByRole("button", { name: "Export CSV" })).toBeEnabled();
+  await expect(page.locator("input[type=password], input[autocomplete=username]")).toHaveCount(0);
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export CSV" }).click();
+  await expect(await download).toBeTruthy();
+});
+
+test("@claim:saved-regions-local saves a protected region only in browser storage", async ({ page }) => {
   const requests: string[] = [];
-  await page.addInitScript(() => {
-    localStorage.setItem("sb_license:caption-placement-check", "real-license-token");
-    localStorage.setItem("sb_license:caption-placement-check:verdict", JSON.stringify({ valid: true, checked: Date.now() }));
-  });
   page.on("request", (request) => requests.push(request.url()));
   await page.goto("/demo/");
+  await page.getByRole("link", { name: "Start for real" }).click();
+  await page.locator("#video-file").setInputFiles(resolve("tests/fixtures/sample.webm"));
+  await page.locator("#caption-file").setInputFiles(resolve("tests/fixtures/sample.srt"));
+  await page.getByRole("button", { name: /Scan caption cues/ }).click();
   await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
+  await page.getByRole("button", { name: "Mark protected region" }).click();
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Save protected regions" }).click();
+  await expect(page.getByText(/protected region.+saved for future checks/)).toBeVisible();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("cpc:protected-regions"))).not.toBeNull();
   expect(requests.every((url) => new URL(url).origin === "http://127.0.0.1:4173")).toBeTruthy();
-  await expect(page.locator("body")).not.toHaveClass(/studio-unlocked/);
-  await expect(page.getByRole("button", { name: /Save regions/ })).toBeDisabled();
+});
+
+test("@claim:no-tracking uses no third-party requests", async ({ page }) => {
+  const requests: string[] = [];
+  page.on("request", (request) => requests.push(request.url()));
+  for (const route of ["/", "/demo/", "/check/", "/privacy/", "/terms/"]) await page.goto(route);
+  expect(requests.every((url) => new URL(url).origin === "http://127.0.0.1:4173")).toBeTruthy();
 });
 
 test("@claim:offline-demo reloads the shipped demo after its first visit", async ({ page, context }) => {
@@ -46,13 +79,16 @@ test("@claim:offline-demo reloads the shipped demo after its first visit", async
   await expect(page.locator("#scan-summary")).toContainText("2 cues sampled", { timeout: 15_000 });
   await expect.poll(() => page.locator("html").getAttribute("data-offline-ready")).toBe("true");
   expect(await page.evaluate(async () => {
-    const cache = await caches.open("caption-placement-check-v4");
+    const cache = await caches.open("caption-placement-check-v6");
     const assets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
       .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
     return Promise.all(assets.map(async (asset) => Boolean(await cache.match(asset))));
   })).toEqual([true, true]);
   await context.setOffline(true);
-  await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
+  await page.reload();
+  expect(page.url()).toContain("/demo/");
+  await expect(page).toHaveTitle("Demo — Caption Placement Check", { timeout: 15_000 });
+  await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible({ timeout: 15_000 });
   await expect(page.locator("#findings li")).toHaveCount(2);
   await context.setOffline(false);
 });
@@ -81,6 +117,16 @@ test("checker exposes keyboard-operable local inputs and protected-region markin
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("Enter");
   await expect(page.locator("#scan-summary")).toContainText("2 cues need a closer look");
+});
+
+test("populated demo has a clean landmark tree at desktop and mobile", async ({ page }) => {
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/demo/");
+    await expect(page.locator("#findings li")).toHaveCount(2, { timeout: 15_000 });
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.filter((issue) => ["serious", "critical", "moderate"].includes(issue.impact || ""))).toEqual([]);
+  }
 });
 
 test("mobile layout keeps primary actions and legal links accessible", async ({ page }) => {

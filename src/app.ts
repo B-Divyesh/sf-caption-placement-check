@@ -3,6 +3,7 @@ import {
   captionRegion, findingToCsv, formatTime, intersectionRatio, parseCaptions, recommendZone,
   type CaptionCue, type Finding, type FindingKind, type Region
 } from "./captions";
+import { denseRegionsFromPixels } from "./density";
 
 type FaceDetectorLike = { detect(input: CanvasImageSource): Promise<Array<{ boundingBox: DOMRectReadOnly }>> };
 
@@ -115,31 +116,8 @@ function seek(time: number): Promise<void> {
 
 function denseRegions(canvas: HTMLCanvasElement): Region[] {
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const cols = 8, rows = 6, cellW = Math.floor(width / cols), cellH = Math.floor(height / rows);
-  const regions: Region[] = [];
-  const lum = (x: number, y: number) => {
-    const i = (y * width + x) * 4;
-    return data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-  };
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      let edges = 0, samples = 0, horizontalRuns = 0;
-      for (let y = row * cellH + 2; y < Math.min(height - 2, (row + 1) * cellH); y += 2) {
-        let rowEdges = 0;
-        for (let x = col * cellW + 2; x < Math.min(width - 2, (col + 1) * cellW); x += 2) {
-          const gx = Math.abs(lum(x + 1, y) - lum(x - 1, y));
-          const gy = Math.abs(lum(x, y + 1) - lum(x, y - 1));
-          if (gx + gy > 82) { edges++; rowEdges++; }
-          samples++;
-        }
-        if (rowEdges >= 3) horizontalRuns++;
-      }
-      const density = edges / Math.max(1, samples);
-      if (density > 0.18 && horizontalRuns >= 3) regions.push({ x: col / cols, y: row / rows, width: 1 / cols, height: 1 / rows });
-    }
-  }
-  return regions;
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  return denseRegionsFromPixels(image.data, image.width, image.height);
 }
 
 async function faceRegions(canvas: HTMLCanvasElement): Promise<Region[]> {
@@ -157,8 +135,7 @@ async function scanVideo() {
   activeFinding = null;
   protectedRegions = isDemo ? [{ x: 0.12, y: 0.72, width: 0.76, height: 0.2 }] : [];
   if (!isDemo) try {
-    const cachedVerdict = JSON.parse(localStorage.getItem(VERDICT_KEY) || "null") as { valid?: boolean } | null;
-    if (cachedVerdict?.valid) protectedRegions = JSON.parse(localStorage.getItem("cpc:protected-regions") || "[]") as Region[];
+    protectedRegions = JSON.parse(localStorage.getItem("cpc:protected-regions") || "[]") as Region[];
   } catch { protectedRegions = []; }
   renderFindings();
   $("#progress-wrap").hidden = false;
@@ -363,47 +340,6 @@ function download(name: string, type: string, value: string) {
 $("#export-csv").addEventListener("click", () => download("caption-placement-findings.csv", "text/csv", findingToCsv(findings)));
 $("#new-check").addEventListener("click", () => { scanCancelled = true; location.href = isDemo ? "/demo/" : "/check/"; });
 
-const LICENSE_KEY = "sb_license:caption-placement-check";
-const VERDICT_KEY = `${LICENSE_KEY}:verdict`;
-const API = "https://api.sociobot.in/api/v1/products/caption-placement-check";
-
-function setStudio(active: boolean, message: string) {
-  document.body.classList.toggle("studio-unlocked", active);
-  document.querySelectorAll<HTMLButtonElement>(".studio-only").forEach((button) => { button.disabled = !active; });
-  $("#license-status").textContent = message;
-  if (active) $("#buy-link").textContent = "Studio unlocked";
-}
-
-async function verifyLicense(token: string, force = false) {
-  const cached = JSON.parse(localStorage.getItem(VERDICT_KEY) || "null") as { valid: boolean; checked: number } | null;
-  if (!force && cached?.valid && Date.now() - cached.checked < 86_400_000) { setStudio(true, "Studio is active on this device."); return; }
-  if (cached?.valid) setStudio(true, "Studio is active; checking the license in the background…");
-  if (!navigator.onLine) { $("#license-status").textContent = cached?.valid ? "Studio is active from the last check. You are offline." : "Connect to the internet once to verify this license."; return; }
-  try {
-    const response = await fetch(`${API}/verify?license=${encodeURIComponent(token)}`);
-    if (!response.ok) throw new Error("Verification service unavailable");
-    const result = await response.json() as { valid: boolean; reason?: string };
-    localStorage.setItem(VERDICT_KEY, JSON.stringify({ valid: result.valid, checked: Date.now() }));
-    setStudio(result.valid, result.valid ? "Studio is active on this device." : "This license is no longer active. You can buy or restore another license.");
-  } catch { $("#license-status").textContent = "Could not reach license verification. The free checker is still available."; }
-}
-
-const queryLicense = !isDemo ? new URLSearchParams(location.search).get("license") : null;
-if (queryLicense) {
-  localStorage.setItem(LICENSE_KEY, queryLicense);
-  history.replaceState({}, "", location.pathname + location.hash);
-}
-const savedLicense = !isDemo ? queryLicense || localStorage.getItem(LICENSE_KEY) : null;
-if (savedLicense) void verifyLicense(savedLicense);
-
-$("#restore-license").addEventListener("click", () => { $("#license-form").hidden = false; ($("#license-token") as HTMLInputElement).focus(); });
-$("#license-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const token = ($("#license-token") as HTMLInputElement).value.trim();
-  if (!token) { $("#license-status").textContent = "Paste the license token from your receipt."; return; }
-  localStorage.setItem(LICENSE_KEY, token); void verifyLicense(token, true);
-});
-
 $("#save-preset").addEventListener("click", () => {
   if (isDemo) { $("#region-help").textContent = "Demo changes are kept only for this sample review."; return; }
   if (!protectedRegions.length) { $("#region-help").textContent = "Mark at least one protected region before saving a preset."; return; }
@@ -417,7 +353,7 @@ $("#export-json").addEventListener("click", () => download("caption-placement-pr
 }, null, 2)));
 
 window.addEventListener("offline", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Offline · local checks still work"; });
-window.addEventListener("online", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Media stays on this device"; });
+window.addEventListener("online", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Checks media on this device"; });
 
 async function startDemo() {
   const banner = document.createElement("aside");
@@ -440,7 +376,7 @@ async function startDemo() {
 if (isDemo) void startDemo();
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
-  void navigator.serviceWorker.register("/sw.js?revision=4").then(async () => {
+  void navigator.serviceWorker.register("/sw.js?revision=6").then(async () => {
     const ready = await navigator.serviceWorker.ready;
     const needsControlledReload = !navigator.serviceWorker.controller || navigator.serviceWorker.controller.scriptURL !== ready.active?.scriptURL;
     if (needsControlledReload) {
@@ -454,7 +390,7 @@ if ("serviceWorker" in navigator) window.addEventListener("load", () => {
       .filter((url) => new URL(url).origin === location.origin);
     const documentAssets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
       .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
-    await caches.open("caption-placement-check-v4").then((cache) => cache.addAll([...new Set([location.pathname, ...resources, ...documentAssets]) ]));
+    await caches.open("caption-placement-check-v6").then((cache) => cache.addAll([...new Set([location.pathname, ...resources, ...documentAssets]) ]));
     document.documentElement.dataset.offlineReady = "true";
   }).catch(() => undefined);
 });

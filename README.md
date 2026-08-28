@@ -15,7 +15,7 @@ Try the isolated sample review in one click: <https://caption-placement-check.so
 - Uses an available platform face detector and a visual-density heuristic as advisory signals.
 - Lets a reviewer draw protected regions for interpreters, slides, signs, or other meaningful content.
 - Exports the review list as CSV for free.
-- Keeps Studio region presets and JSON project reports ready for a future $19 license. Checkout is not published yet.
+- Saves protected-region presets in the browser when you choose, and exports JSON project reports.
 
 ## Run locally
 
@@ -58,6 +58,10 @@ Early desktop builds are unsigned. On macOS, right-click the app and choose **Op
 
 ## Privacy and architecture
 
-The app has no telemetry or advertising analytics and uses no runtime CDN resources. The product may store a license token, cached verification verdict, optional Studio preset, and release metadata locally. Demo mode reads none of those values. See [`site/privacy/index.html`](site/privacy/index.html) and [`site/terms/index.html`](site/terms/index.html).
+The app has no telemetry or advertising analytics and uses no runtime CDN resources. Chosen media is processed locally. Saved protected regions stay in browser storage until you clear site data; demo mode saves nothing. See [`site/privacy/index.html`](site/privacy/index.html) and [`site/terms/index.html`](site/terms/index.html).
+
+## Benchmark
+
+Run `npm run test:benchmark` for the labelled 30-video placement regression fixture. It checks the brief target against deterministic representative frames without making a public accuracy promise. See [`.factory/benchmark.md`](.factory/benchmark.md).
 
 The visual rationale, asset prompt, and provenance are documented in [`.factory/design.md`](.factory/design.md). The software is MIT licensed.

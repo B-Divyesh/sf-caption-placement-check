@@ -8,10 +8,31 @@
   },
   {
     "id": "media-local",
-    "claim": "Sample media stays local and demo ignores real license state",
-    "where": "demo flow and privacy policy",
+    "claim": "A chosen video and caption file are processed locally and are not uploaded during a review",
+    "where": "landing page, checker setup, privacy policy, README",
     "test": "npm run test:e2e -- --grep @claim:media-local",
-    "sandbox": "fresh browser context seeds a real license, opens /demo/, records every request, and asserts only same-origin sample traffic plus locked Studio controls"
+    "sandbox": "fresh browser context opens /demo/, enters the checker, scans shipped local fixtures, records all requests and asserts no media-bearing request or third-party request occurs"
+  },
+  {
+    "id": "no-account",
+    "claim": "Core scanning and CSV export work without an account",
+    "where": "landing page facts and terms",
+    "test": "npm run test:e2e -- --grep @claim:no-account",
+    "sandbox": "fresh browser context opens /demo/, completes the scan, and downloads the free CSV without an account or sign-in control"
+  },
+  {
+    "id": "saved-regions-local",
+    "claim": "Saved protected regions stay in browser storage until you clear site data",
+    "where": "privacy policy",
+    "test": "npm run test:e2e -- --grep @claim:saved-regions-local",
+    "sandbox": "fresh browser context enters from /demo/, scans local fixtures, saves a keyboard-added region, asserts the browser-only storage key and no third-party request"
+  },
+  {
+    "id": "no-tracking",
+    "claim": "The public site uses no advertising or behavioral analytics requests",
+    "where": "site footer and privacy policy",
+    "test": "npm run test:e2e -- --grep @claim:no-tracking",
+    "sandbox": "fresh browser context visits landing, demo, checker, privacy, and terms while recording requests; every request is same-origin"
   },
   {
     "id": "offline-demo",

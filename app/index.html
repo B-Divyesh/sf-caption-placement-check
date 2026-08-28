@@ -11,10 +11,10 @@
     <title>Caption Placement Check — local video preflight</title>
   </head>
   <body class="app-shell">
-    <a class="skip-link" href="#main">Skip to checker</a>
     <header class="app-header">
+      <a class="skip-link" href="#main">Skip to checker</a>
       <a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a>
-      <div class="local-badge"><span aria-hidden="true">●</span> Media stays on this device</div>
+      <div class="local-badge"><span aria-hidden="true">●</span> Checks media on this device</div>
     </header>
     <main id="main" class="workspace">
       <section class="workspace-intro" aria-labelledby="app-title">
@@ -55,27 +55,22 @@
             </div>
             <div class="viewer-tools">
               <button class="quiet-button" id="mark-region" type="button" aria-pressed="false">Mark protected region</button>
-              <button class="quiet-button studio-only" id="save-preset" type="button" disabled title="Studio feature">Save regions · Studio</button>
-              <button class="quiet-button studio-only" id="export-json" type="button" disabled title="Studio feature">Export JSON · Studio</button>
+              <button class="quiet-button" id="save-preset" type="button">Save protected regions</button>
+              <button class="quiet-button" id="export-json" type="button">Export project JSON</button>
               <span id="region-help">Add an interpreter, slide, or sign that automation may miss.</span>
             </div>
             <div class="notice"><strong>Advisory check.</strong> Confirm every alert and watch the final video. This does not certify legal or WCAG compliance.</div>
           </div>
-          <aside class="cue-panel" aria-label="Caption findings">
+          <div class="cue-panel">
             <div class="cue-toolbar"><div class="filter-group" role="group" aria-label="Filter findings"><button class="filter active" data-filter="open" type="button">Open <span id="open-count">0</span></button><button class="filter" data-filter="all" type="button">All <span id="all-count">0</span></button></div></div>
             <ol id="findings" class="findings"></ol>
             <div id="no-findings" class="empty-review" hidden><span aria-hidden="true">✓</span><h3>No overlaps found in sampled frames</h3><p>Still watch the full export—automated checks can miss motion, stylized text, and non-frontal faces.</p></div>
-          </aside>
+          </div>
         </div>
       </section>
 
-      <section class="studio-panel" aria-labelledby="studio-title">
-        <div><p class="eyebrow">Optional one-time unlock</p><h2 id="studio-title">Keep repeat productions consistent</h2><p>Studio adds reusable protected-region presets and JSON project reports. Core scanning, recommendations, and CSV export stay free.</p></div>
-        <div class="studio-actions"><span class="price">$19 <small>once</small></span><span class="checkout-pending" id="buy-link">Studio purchase is being set up.</span><button class="text-button" id="restore-license" type="button">Restore a license</button></div>
-        <form id="license-form" class="license-form" hidden><label for="license-token">License token</label><div><input id="license-token" autocomplete="off" spellcheck="false" /><button class="secondary-button" type="submit">Verify license</button></div><p id="license-status" role="status"></p></form>
-      </section>
     </main>
-    <footer class="app-footer"><span>Made for careful publishing.</span><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav><small>Built by Param Factory · v0.1.1</small></footer>
+    <footer class="app-footer"><span>Made for careful publishing.</span><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav><small>Built by Param Factory · v0.1.2</small></footer>
     <script type="module" src="../src/app.ts"></script>
   </body>
 </html>
