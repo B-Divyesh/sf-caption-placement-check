@@ -1,5 +1,37 @@
 # Caption Placement Check v0.1.0 — handoff
 
+## Repair: release lookup and demo contract (2026-08-28)
+
+- Repaired the production-only download lookup. The landing page now reads `https://api.github.com/repos/B-Divyesh/sf-caption-placement-check/releases/latest`, which returns `Access-Control-Allow-Origin: *`, instead of fetching the CORS-blocked GitHub release-download redirect.
+- Successful release metadata is cached in `localStorage` under `cpc:release-metadata:v1` for one hour. Platform buttons use `browser_download_url` only as navigation links. Missing, rate-limited, malformed, offline, or failed metadata now shows: “Downloads are being published. Visit the release page for the newest build.” No error is thrown.
+- Added focused unit regression coverage for API selection, caching, unavailable metadata, and platform asset selection (`tests/releases.test.ts`).
+- Added `/demo/`, with a shipped two-cue WebM/SRT sample, automatic scan, persistent no-save banner, Reset demo, Start for real, separate no-storage behavior, and offline shell/sample caching. The landing’s first action now opens that demo.
+- Added `.factory/claims.json`, `.factory/demo.md`, and `.factory/copy-audit.md`; added an original styled 404 page, security headers, sitemap demo URL, and release-safe metadata.
+
+### Repair verification
+
+Run from a clean checkout:
+
+```sh
+npm ci
+npm test
+npm run check
+npm run build
+npm run test:e2e
+sh -n public/install.sh
+npm audit --omit=dev
+```
+
+Completed 2026-08-28:
+
+- `npm test`: 11/11 passed, including four release API/cache regression tests.
+- `npm run check`: TypeScript and `cargo check` passed (Tauri GTK/WebKit dependencies installed in the verification container).
+- `npm run build`: passed; exact deployment output is `dist/site/` and contains `/demo/`, `/check/`, `/privacy/`, `/terms/`, and `404.html`.
+- `npm run test:e2e`: 8/8 Chromium tests passed. They cover axe serious/critical findings, keyboard skip links, 390px layout, local WebM/SRT scan and CSV download, demo isolation, same-origin demo requests, offline demo reload, and no local release-page console errors. Playwright Axe is the accessibility integration; no `verify-url.sh` exists in this repository.
+- `sh -n public/install.sh` passed; `npm audit --omit=dev` reported 0 vulnerabilities.
+- Live failure reproduction before this deployment: `curl -I https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest/download/latest.json` returned a GitHub `302` redirect with no `Access-Control-Allow-Origin`; `curl -I https://api.github.com/repos/B-Divyesh/sf-caption-placement-check/releases/latest` returned `200` with `access-control-allow-origin: *`.
+- Built sizes: landing JavaScript 3.28 KB and CSS 21.04 KB uncompressed; checker/demo JavaScript 16.28 KB and CSS 12.49 KB; shipped sample video 1.7 KB; hero WebP 23.02 KB.
+
 ## What was built
 
 - A real local SRT/WebVTT plus video review flow in the browser and Tauri 2 desktop shell.

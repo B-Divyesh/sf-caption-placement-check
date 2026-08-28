@@ -16,6 +16,7 @@ const stage = $("#video-stage");
 const review = $("#review");
 const inputError = $("#input-error");
 const placement = $("#placement") as HTMLSelectElement;
+const isDemo = location.pathname.replace(/\/+$/, "") === "/demo" || new URLSearchParams(location.search).get("demo") === "1";
 
 let videoFile: File | null = null;
 let captionFile: File | null = null;
@@ -149,7 +150,7 @@ async function scanVideo() {
   findings = [];
   activeFinding = null;
   protectedRegions = [];
-  try {
+  if (!isDemo) try {
     const cachedVerdict = JSON.parse(localStorage.getItem(VERDICT_KEY) || "null") as { valid?: boolean } | null;
     if (cachedVerdict?.valid) protectedRegions = JSON.parse(localStorage.getItem("cpc:protected-regions") || "[]") as Region[];
   } catch { protectedRegions = []; }
@@ -313,7 +314,7 @@ function download(name: string, type: string, value: string) {
 }
 
 $("#export-csv").addEventListener("click", () => download("caption-placement-findings.csv", "text/csv", findingToCsv(findings)));
-$("#new-check").addEventListener("click", () => { scanCancelled = true; location.reload(); });
+$("#new-check").addEventListener("click", () => { scanCancelled = true; location.href = isDemo ? "/demo/" : "/check/"; });
 
 const LICENSE_KEY = "sb_license:caption-placement-check";
 const VERDICT_KEY = `${LICENSE_KEY}:verdict`;
@@ -340,7 +341,7 @@ async function verifyLicense(token: string, force = false) {
   } catch { $("#license-status").textContent = "Could not reach license verification. The free checker is still available."; }
 }
 
-const queryLicense = new URLSearchParams(location.search).get("license");
+const queryLicense = !isDemo ? new URLSearchParams(location.search).get("license") : null;
 if (queryLicense) {
   localStorage.setItem(LICENSE_KEY, queryLicense);
   history.replaceState({}, "", location.pathname + location.hash);
@@ -357,6 +358,7 @@ $("#license-form").addEventListener("submit", (event) => {
 });
 
 $("#save-preset").addEventListener("click", () => {
+  if (isDemo) { $("#region-help").textContent = "Demo changes are kept only for this sample review."; return; }
   if (!protectedRegions.length) { $("#region-help").textContent = "Mark at least one protected region before saving a preset."; return; }
   localStorage.setItem("cpc:protected-regions", JSON.stringify(protectedRegions));
   $("#region-help").textContent = `${protectedRegions.length} protected ${protectedRegions.length === 1 ? "region" : "regions"} saved for future checks.`;
@@ -369,3 +371,43 @@ $("#export-json").addEventListener("click", () => download("caption-placement-pr
 
 window.addEventListener("offline", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Offline · local checks still work"; });
 window.addEventListener("online", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Media stays on this device"; });
+
+async function startDemo() {
+  const banner = document.createElement("aside");
+  banner.className = "demo-banner";
+  banner.setAttribute("aria-label", "Demo mode");
+  banner.innerHTML = "<strong>Demo — sample data, nothing is saved</strong><span>Two short caption cues are ready to inspect.</span><button type=\"button\">Reset demo</button><a href=\"/check/\">Start for real</a>";
+  document.body.prepend(banner);
+  banner.querySelector("button")!.addEventListener("click", () => { location.href = "/demo/"; });
+  try {
+    const [videoResponse, captionResponse] = await Promise.all([fetch("/demo/sample.webm"), fetch("/demo/sample.srt")]);
+    if (!videoResponse.ok || !captionResponse.ok) throw new Error("Sample files were unavailable");
+    setFile("video", new File([await videoResponse.blob()], "sample-lesson.webm", { type: "video/webm" }));
+    setFile("caption", new File([await captionResponse.blob()], "sample-lesson.srt", { type: "application/x-subrip" }));
+    await loadInputs();
+  } catch {
+    setError("The sample could not load. Reset the demo or try the browser checker with your own files.");
+  }
+}
+
+if (isDemo) void startDemo();
+
+if ("serviceWorker" in navigator) window.addEventListener("load", () => {
+  void navigator.serviceWorker.register("/sw.js?revision=3").then(async (registration) => {
+    const installing = registration.installing;
+    if (installing) await new Promise<void>((resolve) => installing.addEventListener("statechange", () => {
+      if (installing.state === "activated" || installing.state === "redundant") resolve();
+    }));
+    await navigator.serviceWorker.ready;
+    if (registration.active && navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL !== registration.active.scriptURL) {
+      await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
+    }
+    const resources = performance.getEntriesByType("resource")
+      .map((entry) => entry.name)
+      .filter((url) => new URL(url).origin === location.origin);
+    const documentAssets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
+      .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
+    await caches.open("caption-placement-check-v3").then((cache) => cache.addAll([...new Set([location.pathname, ...resources, ...documentAssets]) ]));
+    document.documentElement.dataset.offlineReady = "true";
+  }).catch(() => undefined);
+});

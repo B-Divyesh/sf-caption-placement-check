@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sample-demo",
+    "claim": "Try it with sample data without saving it",
+    "where": "landing page primary action, demo banner",
+    "test": "npm run test:e2e -- --grep @claim:sample-demo",
+    "sandbox": "fresh browser context opens /demo/; sample scan completes and no application storage key is written"
+  },
+  {
+    "id": "media-local",
+    "claim": "Sample review stays on this site",
+    "where": "demo flow and privacy policy",
+    "test": "npm run test:e2e -- --grep @claim:media-local",
+    "sandbox": "fresh browser context records every request while /demo/ scans its shipped sample; each is same-origin"
+  },
+  {
+    "id": "offline-demo",
+    "claim": "Works offline after the first visit",
+    "where": "desktop download description and README",
+    "test": "npm run test:e2e -- --grep @claim:offline-demo",
+    "sandbox": "fresh browser context loads /demo/, waits for its service worker, goes offline, and reloads the demo shell"
+  },
+  {
+    "id": "local-scan",
+    "claim": "Checks a video and caption file, then exports a CSV review list",
+    "where": "README and browser checker",
+    "test": "npm run test:e2e -- --grep @claim:local-scan",
+    "sandbox": "fresh browser context uploads shipped WebM and SRT fixtures, completes the scan, and downloads the CSV"
+  }
+]

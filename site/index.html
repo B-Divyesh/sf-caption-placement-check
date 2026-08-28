@@ -4,24 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#101313" />
-    <meta name="description" content="Locally check whether SRT or WebVTT captions cover faces, slides, interpreters, or essential on-screen content." />
+    <meta name="description" content="Check whether captions cover speakers, slides, interpreters, or important on-screen text before publishing a video." />
+    <link rel="canonical" href="https://caption-placement-check.sociobot.in/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Caption Placement Check — check caption placement" />
+    <meta property="og:description" content="Check captions against the frame before publishing." />
+    <meta property="og:image" content="https://caption-placement-check.sociobot.in/assets/hero-projection-room.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <title>Caption Placement Check — see the frame before you publish</title>
+    <title>Caption Placement Check — check caption placement</title>
   </head>
   <body class="landing">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a>
-      <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#studio">Studio</a><a class="header-download" href="#download">Download</a></nav>
+      <nav aria-label="Main navigation"><a href="/demo/">Demo</a><a href="#how">How it works</a><a href="#studio">Studio</a><a class="header-download" href="#download">Download</a></nav>
     </header>
     <main id="main">
       <section class="hero">
         <div class="hero-copy">
           <p class="eyebrow">Local accessibility preflight</p>
-          <h1>See the frame before you publish.</h1>
-          <p class="hero-lead">Find caption cues that may cover a speaker, slide, interpreter, or essential on-screen text—without uploading your video.</p>
-          <div class="hero-actions"><a class="primary-button" href="#download" id="hero-download">Download for your computer <span aria-hidden="true">↓</span></a><a class="quiet-button" href="/check/">Try the browser checker</a></div>
-          <p class="privacy-line"><span aria-hidden="true">●</span> No account · no media uploads · works offline</p>
+          <h1>Find captions that hide important video.</h1>
+          <p class="hero-lead">For educators and creators who need a careful caption check before publishing.</p>
+          <div class="hero-actions"><a class="primary-button" href="/demo/">Try it with sample data <span aria-hidden="true">→</span></a><a class="quiet-button" href="/check/">Check your own files</a></div>
+          <p class="action-note">Opens a short sample review with two caption cues.</p>
+          <ul class="plain-facts"><li>Runs on your device</li><li>No account required</li><li>Free core check</li></ul>
         </div>
         <figure class="hero-scene">
           <img src="/assets/hero-projection-room.webp" width="1200" height="800" alt="An empty lecture theatre with a presenter silhouette and slide projected above a clear lower caption zone" fetchpriority="high" decoding="async" />
@@ -36,7 +43,7 @@
       </section>
 
       <section id="how" class="how-section">
-        <div class="section-kicker"><p class="eyebrow">The preflight bench</p><h2>One focused pass before release</h2><p>Caption generators solve the words. This check helps protect the image those words sit on.</p></div>
+        <div class="section-kicker"><p class="eyebrow">The preflight bench</p><h2>One focused pass before release</h2><p>Caption tools make words. This check keeps those words from hiding the image.</p></div>
         <ol class="process">
           <li><span class="process-number">01</span><div><h3>Pair the final exports</h3><p>Drop in the video and its SRT or WebVTT file. Files stay in local memory.</p></div></li>
           <li><span class="process-number">02</span><div><h3>Sample every cue</h3><p>The checker seeks into each timed cue and looks for face or dense visual overlap.</p></div></li>
@@ -56,7 +63,7 @@
           <a class="primary-button download-main" id="platform-download" href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest">View latest downloads</a>
           <div class="platform-links"><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="mac">macOS</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="windows">Windows</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest" data-platform="linux">Linux</a></div>
           <details><summary>Install from a terminal</summary><code id="install-command">curl -fsSL https://caption-placement-check.sociobot.in/install.sh | sh</code><button class="copy-button" data-copy="#install-command" type="button">Copy command</button></details>
-          <p id="release-status" class="release-status" role="status">Checking the latest verified release…</p>
+          <p id="release-status" class="release-status" role="status">Checking published downloads…</p>
         </div>
       </section>
 
@@ -67,7 +74,7 @@
 
       <section class="honesty"><h2>Built for a better review, not a compliance badge.</h2><p>Detection is advisory. Always watch the final export with captions enabled, include people who use captions in your review when possible, and check your publishing platform’s own caption rendering.</p></section>
     </main>
-    <footer class="site-footer"><div><a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a><p>Original generated environmental artwork. No tracking. No media uploads.</p></div><nav aria-label="Footer"><a href="/check/">Browser checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check">Source</a></nav></footer>
+    <footer class="site-footer"><div><a class="brand" href="/" aria-label="Caption Placement Check home"><span class="brand-mark" aria-hidden="true"></span><span>Caption Placement Check</span></a><p>Original generated environmental artwork. No tracking. Media stays on your device.</p></div><nav aria-label="Footer"><a href="/demo/">Demo</a><a href="/check/">Browser checker</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-caption-placement-check">Source</a></nav><small>Built by Param Factory · v0.1.0</small></footer>
     <script type="module" src="../src/site.ts"></script>
   </body>
 </html>

@@ -6,6 +6,8 @@ It is intentionally not a transcription tool or compliance certificate. A human 
 
 Live site and browser checker: <https://caption-placement-check.sociobot.in>
 
+Try the isolated sample review in one click: <https://caption-placement-check.sociobot.in/demo/>. It loads a shipped two-cue lesson sample and does not save demo data.
+
 ## What it does
 
 - Processes video and caption files locally—media is never uploaded.
@@ -37,6 +39,8 @@ npm run tauri build  # native bundle for the current platform
 ```
 
 The release workflow is the source of platform binaries. Tag `v*` or dispatch `.github/workflows/release.yml`; GitHub Actions builds macOS arm64/x64, Windows x64, and Linux x64 bundles and publishes `SHA256SUMS` plus `latest.json`.
+
+The landing page reads release metadata from the CORS-enabled GitHub Releases API and caches a successful result for one hour. If GitHub has no release or cannot be reached, it calmly links to the Releases page instead of failing in the browser console.
 
 ## Install
 

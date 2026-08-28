@@ -1,47 +1,46 @@
 import "./styles.css";
 import "./site.css";
+import { assetForPlatform, loadReleaseMetadata, RELEASE_PAGE, type Platform } from "./releases";
 
-type Asset = { url: string; sha256?: string; name?: string };
-type Manifest = { version: string; platforms: Record<string, Asset | Asset[]> };
-const manifestUrl = "https://github.com/B-Divyesh/sf-caption-placement-check/releases/latest/download/latest.json";
 const download = document.querySelector<HTMLAnchorElement>("#platform-download");
 const label = document.querySelector("#platform-label");
 const status = document.querySelector("#release-status");
 const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-platform]")];
 const isWindows = /Windows/i.test(navigator.userAgent);
 const isMac = /Macintosh|Mac OS X/i.test(navigator.userAgent);
-const platform = isWindows ? "windows" : isMac ? "mac" : "linux";
+const platform: Platform = isWindows ? "windows" : isMac ? "mac" : "linux";
 const names = { windows: "Windows", mac: "macOS", linux: "Linux" };
 if (label) label.textContent = `${names[platform]} detected`;
 if (download) download.textContent = `Download for ${names[platform]}`;
 
-function firstAsset(value?: Asset | Asset[]) {
-  const assets = Array.isArray(value) ? value : value ? [value] : [];
-  return assets.find((asset) => /\.(dmg|exe|AppImage)$/i.test(asset.name || asset.url)) || assets[0];
+function publishingState() {
+  if (download) download.href = RELEASE_PAGE;
+  links.forEach((link) => { link.href = RELEASE_PAGE; });
+  if (status) status.textContent = "Downloads are being published. Visit the release page for the newest build.";
 }
 
 const isProduction = location.hostname === "caption-placement-check.sociobot.in";
-if (download && status && isProduction) fetch(manifestUrl, { cache: "no-cache" }).then(async (response) => {
-  if (!response.ok) throw new Error("No release manifest");
-  const manifest = await response.json() as Manifest;
-  const asset = firstAsset(manifest.platforms[platform]);
-  if (asset?.url) download.href = asset.url;
+if (download && status && isProduction) void loadReleaseMetadata(fetch, localStorage).then((release) => {
+  if (!release) return publishingState();
+  const asset = assetForPlatform(release, platform);
+  if (!asset) return publishingState();
+  download.href = asset.browser_download_url;
   for (const link of links) {
-    const target = firstAsset(manifest.platforms[link.dataset.platform!]);
-    if (target?.url) link.href = target.url;
+    const target = assetForPlatform(release, link.dataset.platform as Platform);
+    link.href = target?.browser_download_url || release.html_url;
   }
-  status.textContent = `Latest: v${manifest.version.replace(/^v/, "")} · SHA-256 checksums published with the release.`;
-}).catch(() => {
-  status.textContent = "The first signed-off build is being prepared. The browser checker is available now.";
-});
+  status.textContent = `Latest: ${release.tag_name} · SHA-256 checksums are published with this release.`;
+}).catch(publishingState);
 else if (status) status.textContent = "Release links resolve on the production site. The browser checker is available now.";
 
 if (isWindows) document.querySelector("#install-command")!.textContent = "irm https://caption-placement-check.sociobot.in/install.ps1 | iex";
 document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => button.addEventListener("click", async () => {
   const source = document.querySelector(button.dataset.copy!)!;
-  await navigator.clipboard.writeText(source.textContent || "");
-  button.textContent = "Copied";
-  setTimeout(() => { button.textContent = "Copy command"; }, 1600);
+  try {
+    await navigator.clipboard.writeText(source.textContent || "");
+    button.textContent = "Copied";
+    setTimeout(() => { button.textContent = "Copy command"; }, 1600);
+  } catch { button.textContent = "Select the command to copy"; }
 }));
 
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => undefined));
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js?revision=3").catch(() => undefined));
