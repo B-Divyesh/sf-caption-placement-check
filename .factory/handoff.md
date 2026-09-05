@@ -1,5 +1,24 @@
 # Caption Placement Check — polish round 1 handoff
 
+## Independent verification 6 — FAIL
+
+On 2026-09-05, a new clean-clone verification found one high-severity
+regression. Do not accept or release this candidate until it is repaired.
+
+- Implementation reviewed: `1647fea2ea7288c6c53d81dc939603f7e18da3da`.
+- Documentation/report SHA: `cd9d1c3b72108ec5f89a3529c593902cc3d66927`.
+- The intervening `1ac7fc1` changes tests and factory evidence only; deployed
+  production JS/CSS hashes match the implementation build.
+- All 22 exact declared claim commands passed; unit tests (16/16), normal E2E
+  (24/24), benchmark, check, build, live route/Axe, offline/demo-isolation,
+  and downloaded Linux desktop-artifact checks passed.
+- `npm run test:e2e -- --repeat-each=2` failed **1/48** at
+  `@claim:manual-regions`: after a keyboard-added protected region, the
+  pointer drag did not add a second protected region. This makes the public
+  pointer-or-keyboard claim unreliable.
+
+See `.factory/verification-6.md` for the complete evidence and reproduction.
+
 ## Result
 
 All 29 findings in `.factory/review-1.md` are resolved. There were no earlier review or polish reports. Repair validation and the static deployment were pushed at `1ac7fc138bfe03cdb7730360f6f007ba23ceabb3`; the existing desktop release `v0.1.4` was built from the preceding application repair commit `1647fea2ea7288c6c53d81dc939603f7e18da3da`.
@@ -65,7 +84,11 @@ Visual evidence is under `.factory/evidence/`. The finding-by-finding matrix is 
 
 ## Known gaps
 
-No product or review finding remains open. Automated caption placement is advisory, as the interface states; users should still watch the final captioned export.
+**Open verification finding F-6-1:** pointer protected-region marking is
+nondeterministic in the repeated browser flow. Repair it and re-run the full
+repeated E2E suite before accepting the product. Automated caption placement
+is also advisory, as the interface states; users should still watch the final
+captioned export.
 
 ## Needs operator action
 
