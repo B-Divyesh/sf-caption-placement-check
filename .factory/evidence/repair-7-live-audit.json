@@ -1,0 +1,121 @@
+{
+  "views": {
+    "desktop": {
+      "actionBottom": 593,
+      "alerts": 2,
+      "demoLabel": true,
+      "sentinels": {
+        "regions": "sentinel-regions",
+        "license": "sentinel-license"
+      },
+      "errors": []
+    },
+    "phone": {
+      "actionBottom": 664,
+      "alerts": 2,
+      "demoLabel": true,
+      "sentinels": {
+        "regions": "sentinel-regions",
+        "license": "sentinel-license"
+      },
+      "errors": []
+    }
+  },
+  "routes": [
+    {
+      "route": "/",
+      "width": 1440,
+      "status": 200,
+      "title": "Caption Placement Check — check caption placement",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/demo/?demo=1",
+      "width": 1440,
+      "status": 200,
+      "title": "Demo — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/check/",
+      "width": 1440,
+      "status": 200,
+      "title": "Caption Placement Check — check captions on a video",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/privacy/",
+      "width": 1440,
+      "status": 200,
+      "title": "Privacy — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/terms/",
+      "width": 1440,
+      "status": 200,
+      "title": "Terms — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/does-not-exist",
+      "width": 1440,
+      "status": 404,
+      "title": "Page not found — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "status": 200,
+      "title": "Caption Placement Check — check caption placement",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/demo/?demo=1",
+      "width": 390,
+      "status": 200,
+      "title": "Demo — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/check/",
+      "width": 390,
+      "status": 200,
+      "title": "Caption Placement Check — check captions on a video",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/privacy/",
+      "width": 390,
+      "status": 200,
+      "title": "Privacy — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/terms/",
+      "width": 390,
+      "status": 200,
+      "title": "Terms — Caption Placement Check",
+      "axeSeriousCritical": 0
+    },
+    {
+      "route": "/does-not-exist",
+      "width": 390,
+      "status": 404,
+      "title": "Page not found — Caption Placement Check",
+      "axeSeriousCritical": 0
+    }
+  ],
+  "checker": {
+    "invalidExtension": true,
+    "emptyError": "The caption file is empty.",
+    "durationError": true,
+    "recoveredSummary": "2 captions checked · 0 alerts need review"
+  },
+  "offline": {
+    "status": "visible",
+    "summary": "1 caption checked · 1 alert needs review",
+    "alerts": 1
+  }
+}
