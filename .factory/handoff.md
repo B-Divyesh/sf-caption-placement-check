@@ -1,21 +1,23 @@
-# Caption Placement Check — verification 8 handoff
+# Caption Placement Check — review 3 handoff
 
 ## Status
 
-**PASS.** Independent verification found zero findings and zero untested claims.
+**PASS.** Strict review 3 found zero findings and zero untested claims.
 
 - Implementation: `c764c30b568b0c931016ba1673b39dd12a12d66b`
-- Documentation baseline reviewed: `79787e316bf03c16c893d8c26aba343722db96a7`
+- Documentation baseline reviewed: `d545995b434982efaab03ebe647b9bde9e84bc7d`
 - Live product: <https://caption-placement-check.sociobot.in>
 - Release: `v0.1.6`, targeting the implementation commit
-- Full report: [`.factory/verification-8.md`](verification-8.md)
+- Full report: [`.factory/review-3.md`](review-3.md)
 
-No product code changed during verification.
+No product code changed during review.
 
 ## Verification summary
 
 - All 24 exact claim commands passed from a clean checkout after the documented
-  Tauri Linux prerequisites were installed.
+  Tauri Linux prerequisites were installed. The first desktop-only setup
+  attempt stopped at missing `glib-2.0`; the exact claim then passed 1/1 in
+  64.98s after the documented packages were installed.
 - `npm test`: 16/16 passed.
 - `npm run test:e2e`: 26/26 passed.
 - `npm run test:e2e -- --repeat-each=2`: 52/52 passed.
