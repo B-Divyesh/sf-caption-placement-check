@@ -7,6 +7,10 @@ deployed static checker is built from implementation commit
 `679c2566026bbeb1c5a0ed506f7e2866fe265317` and serves the repaired checker
 bundle `index-BKJGh-W2.js`.
 
+The separate verification-documentation commit is
+`6d22f4e4535b1bb8409ee1c4bf540ac51f2b866d`; it changes reports only, so it
+does not require another product deployment.
+
 The matching desktop tag is `v0.1.5`. Its GitHub Actions release workflow
 completed successfully at
 <https://github.com/B-Divyesh/sf-caption-placement-check/actions/runs/34014525333>.
