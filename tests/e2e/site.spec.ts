@@ -303,7 +303,9 @@ test("@claim:manual-regions supports keyboard and pointer marking", async ({ pag
   await page.mouse.move(box!.x + 120, box!.y + 100);
   await page.mouse.up();
   const report = JSON.parse((await downloadText(page, "Export project as JSON")).content);
-  expect(report.protectedRegions.length).toBeGreaterThanOrEqual(2);
+  // The pointer gesture must still add its own region after the keyboard
+  // editor has painted and redrawn the same canvas.
+  expect(report.protectedRegions).toHaveLength(2);
 });
 
 test("native first-run sample opens two alerts", async ({ page }) => {

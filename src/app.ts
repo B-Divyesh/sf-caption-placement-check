@@ -36,6 +36,7 @@ let activeFinding: Finding | null = null;
 let protectedRegions: Region[] = [];
 let drawing = false;
 let drawStart: { x: number; y: number } | null = null;
+let drawingPointerId: number | null = null;
 let keyboardRegion: Region = { x: 0.12, y: 0.68, width: 0.76, height: 0.18 };
 let currentFilter: "open" | "all" = "open";
 let scanCancelled = false;
@@ -260,16 +261,24 @@ function drawOverlay(temp?: Region) {
   const ratio = video.videoWidth / video.videoHeight || 16 / 9;
   let width = rect.width, height = width / ratio;
   if (height > rect.height) { height = rect.height; width = height * ratio; }
-  overlay.width = Math.round(width);
-  overlay.height = Math.round(height);
-  overlay.style.width = `${width}px`;
-  overlay.style.height = `${height}px`;
+  const canvasWidth = Math.max(1, Math.round(width));
+  const canvasHeight = Math.max(1, Math.round(height));
+  const cssWidth = `${width}px`;
+  const cssHeight = `${height}px`;
+  // Resetting a canvas during a pointer gesture can drop pointer capture in
+  // some Chromium builds. Resize only when the stage actually changes, then
+  // clear it for the next paint.
+  if (overlay.width !== canvasWidth) overlay.width = canvasWidth;
+  if (overlay.height !== canvasHeight) overlay.height = canvasHeight;
+  if (overlay.style.width !== cssWidth) overlay.style.width = cssWidth;
+  if (overlay.style.height !== cssHeight) overlay.style.height = cssHeight;
   const ctx = overlay.getContext("2d")!;
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
   const paint = (region: Region, color: string, dashed = false) => {
     ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = `${color}22`; ctx.lineWidth = 3;
     if (dashed) ctx.setLineDash([8, 6]);
-    ctx.fillRect(region.x * width, region.y * height, region.width * width, region.height * height);
-    ctx.strokeRect(region.x * width, region.y * height, region.width * width, region.height * height); ctx.restore();
+    ctx.fillRect(region.x * overlay.width, region.y * overlay.height, region.width * overlay.width, region.height * overlay.height);
+    ctx.strokeRect(region.x * overlay.width, region.y * overlay.height, region.width * overlay.width, region.height * overlay.height); ctx.restore();
   };
   protectedRegions.forEach((region) => paint(region, "#80d8b2"));
   if (activeFinding) { paint(activeFinding.region, "#ffd36a", true); paint(activeFinding.captionRegion, "#ff8178"); }
@@ -310,22 +319,53 @@ function addProtectedRegion(region: Region) {
   drawOverlay();
 }
 
+function pointerPosition(event: PointerEvent) {
+  const rect = overlay.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  return {
+    x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)),
+    y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height))
+  };
+}
+
+function stopPointerDrawing(pointerId: number) {
+  drawStart = null;
+  drawingPointerId = null;
+  if (overlay.hasPointerCapture(pointerId)) overlay.releasePointerCapture(pointerId);
+}
+
 overlay.addEventListener("pointerdown", (event) => {
-  if (!drawing) return;
+  if (!drawing || event.button !== 0) return;
+  const start = pointerPosition(event);
+  if (!start) return;
+  event.preventDefault();
+  drawingPointerId = event.pointerId;
+  drawStart = start;
   overlay.setPointerCapture(event.pointerId);
-  drawStart = { x: event.offsetX / overlay.clientWidth, y: event.offsetY / overlay.clientHeight };
 });
 overlay.addEventListener("pointermove", (event) => {
-  if (!drawing || !drawStart) return;
-  const x = event.offsetX / overlay.clientWidth, y = event.offsetY / overlay.clientHeight;
-  drawOverlay({ x: Math.min(x, drawStart.x), y: Math.min(y, drawStart.y), width: Math.abs(x - drawStart.x), height: Math.abs(y - drawStart.y) });
+  if (!drawing || drawingPointerId !== event.pointerId || !drawStart) return;
+  const point = pointerPosition(event);
+  if (!point) return;
+  drawOverlay({ x: Math.min(point.x, drawStart.x), y: Math.min(point.y, drawStart.y), width: Math.abs(point.x - drawStart.x), height: Math.abs(point.y - drawStart.y) });
 });
-overlay.addEventListener("pointerup", (event) => {
-  if (!drawing || !drawStart) return;
-  const x = event.offsetX / overlay.clientWidth, y = event.offsetY / overlay.clientHeight;
-  const region = { x: Math.min(x, drawStart.x), y: Math.min(y, drawStart.y), width: Math.abs(x - drawStart.x), height: Math.abs(y - drawStart.y) };
-  drawStart = null;
-  addProtectedRegion(region);
+function completePointerDrawing(event: PointerEvent) {
+  if (!drawing || drawingPointerId !== event.pointerId || !drawStart) return;
+  const point = pointerPosition(event);
+  const start = drawStart;
+  stopPointerDrawing(event.pointerId);
+  if (!point) { drawOverlay(keyboardRegion); return; }
+  addProtectedRegion({ x: Math.min(point.x, start.x), y: Math.min(point.y, start.y), width: Math.abs(point.x - start.x), height: Math.abs(point.y - start.y) });
+}
+
+overlay.addEventListener("pointerup", completePointerDrawing);
+// Pointer capture should retain an off-canvas release, but keep a window
+// fallback so a completed mouse or touch drag never loses its region.
+window.addEventListener("pointerup", completePointerDrawing);
+overlay.addEventListener("pointercancel", (event) => {
+  if (drawingPointerId !== event.pointerId) return;
+  stopPointerDrawing(event.pointerId);
+  if (drawing) drawOverlay(keyboardRegion);
 });
 
 overlay.addEventListener("keydown", (event) => {
