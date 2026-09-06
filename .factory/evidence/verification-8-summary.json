@@ -1,0 +1,40 @@
+{
+  "work_order": "caption-placement-check-verify-8",
+  "verdict": "PASS",
+  "implementation_commit": "c764c30b568b0c931016ba1673b39dd12a12d66b",
+  "documentation_commit": "79787e316bf03c16c893d8c26aba343722db96a7",
+  "live_url": "https://caption-placement-check.sociobot.in",
+  "findings": 0,
+  "untested_claims": 0,
+  "claims": { "passed": 24, "total": 24 },
+  "tests": {
+    "unit": "16/16",
+    "browser": "26/26",
+    "browser_repeated": "52/52",
+    "benchmark_unit": "1/1",
+    "benchmark_browser": "1/1",
+    "desktop_offline": "PASS",
+    "check": "PASS",
+    "build": "PASS"
+  },
+  "live": {
+    "root_matches_candidate": true,
+    "axe_violations": 0,
+    "normal_route_console_errors": 0,
+    "lighthouse": {
+      "performance": 100,
+      "accessibility": 100,
+      "best_practices": 100,
+      "seo": 100,
+      "lcp_ms": 1052.637,
+      "cls": 0,
+      "tbt_ms": 0
+    }
+  },
+  "release": {
+    "tag": "v0.1.6",
+    "target_commit": "c764c30b568b0c931016ba1673b39dd12a12d66b",
+    "linux_deb_sha256": "bdde533afd3ce504ed22951a78f5ecab1fcd67c6e2d60057af27f154dbc86ac9",
+    "released_package_offline_smoke": "PASS"
+  }
+}
