@@ -1,42 +1,53 @@
-# Caption Placement Check — verification 7 handoff
+# Caption Placement Check — review 2 handoff
 
 ## Status
 
-**PASS.** Independent QA found zero findings and zero untested declared
-claims for implementation `679c2566026bbeb1c5a0ed506f7e2866fe265317`.
-The documentation baseline reviewed was
-`e51edc4dd818d2bc1f820e26326e9364908d923b`; it and `6d22f4e` contain reports
-and metadata only, not a later product image.
+**FAIL.** Review 2 found two acceptance-contract gaps and two untested public
+claims. Product code was not changed.
 
-The live static product is <https://caption-placement-check.sociobot.in>.
-GitHub release `v0.1.5` targets the same implementation commit.
+The implementation reviewed is
+`679c2566026bbeb1c5a0ed506f7e2866fe265317`. The documentation baseline was
+`3a1e0e338a4a2d08d7c5bf8170cbcc31f123f0db`. The live product matches a fresh
+build of that implementation.
 
-## What was verified
+## Findings to repair
 
-- Clean `npm ci`, then all 22 exact commands in `.factory/claims.json`:
-  22/22 passed with no untested entry.
-- `npm test` (16/16), full browser suite (24/24), repeated browser suite
-  (48/48), benchmark, TypeScript/Rust check, build, dependency audit, and
-  installer shell syntax all passed.
-- Fresh live desktop and 390px phone paths: first screen, one-click demo,
-  two populated alerts and recommendations, reset, keyboard and pointer
-  regions, JSON export, offline demo reload, invalid/boundary/recovery input,
-  privacy/legal routes, headers, links, and designed 404.
-- Live Axe on six routes at both viewport sizes found no serious or critical
-  issue. `verify-url.sh` passed with no console errors.
-- The v0.1.5 Linux AMD64 DEB matched published SHA-256
-  `8df2288e6cf67b8364033946ac04affda2f5a107bfd103f8fbdf63fce78cce46`, reported
-  version 0.1.5 after extraction, and stayed running for eight seconds under
-  Xvfb in a clean temporary consumer directory.
+1. Add tagged claim coverage for the public desktop-offline and real-checker
+   offline statements, or narrow those statements to the tested browser demo.
+2. Replace the four text-only walkthrough cards with three to five captioned
+   screenshots of the released desktop app.
 
-## How to verify locally
+Full evidence and earlier-finding dispositions are in
+`.factory/review-2.md`.
 
-Install Node 22+, Rust, and the Tauri Linux development packages:
+## Passing evidence
+
+- All 22 declared claim commands passed independently from a clean clone.
+- Unit tests passed 16/16. Browser tests passed 24/24 and 48/48 when repeated.
+- Benchmark, TypeScript/Rust check, build, dependency audit, and installer
+  syntax passed.
+- Fresh live desktop and phone checks passed for the first screen, populated
+  sample, reset, demo isolation, offline reload, input errors and recovery,
+  keyboard, pointer regions, exports, routes, legal pages, and the designed
+  404.
+- Axe found no violation on root, demo, checker, Privacy, Terms, or 404 at both
+  viewport sizes. The factory URL verifier reported no console errors.
+- Lighthouse mobile scored 100 in all four categories. LCP was 0.9s, CLS was
+  0, and total blocking time was 30ms.
+- Release v0.1.5 targets the implementation commit. The Linux DEB matched its
+  published SHA-256 and ran after its declared dependencies were installed.
+- The installed DEB loaded its bundled sample with external HTTP(S)
+  unavailable and displayed two alerts.
+
+## How to verify
+
+Install Node 22+, Rust, and the documented Linux Tauri packages:
 
 ```sh
 sudo apt-get install libglib2.0-dev libwebkit2gtk-4.1-dev \
   libappindicator3-dev librsvg2-dev patchelf
 npm ci
+# Run each test command in .factory/claims.json.
 npm test
 npm run test:e2e
 npm run test:e2e -- --repeat-each=2
@@ -45,16 +56,13 @@ npm run check
 npm run build
 ```
 
-For the complete public-claim sweep, run each `test` command listed in
-`.factory/claims.json`. The demo is
-`https://caption-placement-check.sociobot.in/?demo=1`.
+The live demo is
+<https://caption-placement-check.sociobot.in/?demo=1>.
 
-## Known limitations and next steps
+## Known operational limits
 
-- Detection is advisory. Review the final captioned export with captions on.
-- No paid offer is currently advertised because billing registration is not
-  available. This is an honest scope limitation; local scanning and CSV/JSON
-  exports are free and do not need an account.
-- Desktop packages are intentionally unsigned. Operator action is needed for
-  Apple notarization and Windows Authenticode certificates before signed
-  distribution.
+- Detection is advisory. Review the final captioned export.
+- The researched paid tier is not offered because billing registration is not
+  available. Scanning and both exports remain free.
+- macOS and Windows builds are unsigned. Signing certificates remain an
+  operator action.
