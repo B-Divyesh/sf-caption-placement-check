@@ -49,6 +49,20 @@
     "sandbox": "clean service-worker state; visit /?demo=1; go offline; reload with the banner and two alerts"
   },
   {
+    "id": "offline-real-check",
+    "claim": "Chosen files can be checked and exported after the browser checker reloads offline",
+    "where": "checker offline status, README",
+    "test": "npm run test:e2e -- --grep @claim:offline-real-check",
+    "sandbox": "dedicated fresh browser context; cache /check/; go offline and reload; choose a labelled shipped video and captions; assert one detected alert and its CSV row"
+  },
+  {
+    "id": "desktop-offline",
+    "claim": "The packaged desktop app loads its bundled sample and completes a check without internet access",
+    "where": "landing download section, desktop first screen, README",
+    "test": "npm run test:desktop-offline",
+    "sandbox": "build a Linux DEB; extract and launch its installed binary under Xvfb with unreachable network proxies; load bundled sample through the real app and assert two captions and two alerts"
+  },
+  {
     "id": "local-scan",
     "claim": "The sample review exports a CSV with every alert",
     "where": "checker, landing page, README",

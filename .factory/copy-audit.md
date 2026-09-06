@@ -1,8 +1,8 @@
-# Copy audit — polish round 1
+# Copy audit — repair 7
 
-Checked 2026-08-28. The first-screen headline is seven words and starts with a verb. The audience sentence is 12 words. The sample action and its result are visible at 390 × 844.
+Checked 2026-09-06. The first-screen headline is seven words and starts with a verb. The audience sentence is 12 words. The sample action and its result are visible at 390 × 844.
 
-No landing or README sentence exceeds 22 words. No banned plain-words term appears in public copy. README has 32 sentences; its longest has 15 words.
+No landing or README sentence exceeds 22 words. No banned plain-words term appears in public copy. README has 35 sentences; its longest has 15 words.
 
 ## Landing sentences
 
@@ -20,12 +20,10 @@ No landing or README sentence exceeds 22 words. No banned plain-words term appea
 | 9 | A caption should support the frame, not hide it. |
 | 12 | The review shows the overlapping region, exact time, and a safer position. |
 | 10 | Add a protected region for content the check may miss. |
-| 7 | See the installed app in four frames. |
-| 13 | Load the lesson sample, inspect the alert list, and export the free CSV. |
-| 6 | Start with a complete local project. |
-| 5 | Frames stay on your device. |
-| 7 | See the time, region, and next move. |
-| 7 | Send the free CSV to an editor. |
+| 13 | Open the sample, inspect both alerts, mark each review, and export the handoff. |
+| 6 | Use the included files without setup. |
+| 7 | See the time, overlap, and safer position. |
+| 8 | Track open alerts, then download CSV or JSON. |
 | 8 | The desktop app runs the same local checker. |
 | 13 | Current builds have no publisher signature, so your platform may ask before opening. |
 | 4 | Downloads are being published. |
@@ -39,6 +37,8 @@ No landing or README sentence exceeds 22 words. No banned plain-words term appea
 | 5 | Check caption placement before publishing. |
 
 Headings, facts, labels, and actions are fragments. They were checked separately for jargon and consistent naming.
+
+The three walkthrough image alternatives contain 15, 14, and 15 words. Each describes the visible app state without repeating its caption.
 
 ## Terminology
 

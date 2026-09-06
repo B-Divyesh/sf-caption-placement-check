@@ -38,11 +38,16 @@
 .demo-warning { position: absolute; left: 15%; bottom: 24%; padding: 6px 10px; background: var(--warning); color: var(--ink); font: 700 12px ui-monospace, monospace; }
 .tick-list { display: grid; gap: 12px; padding: 0; list-style: none; }
 .walkthrough { display: grid; grid-template-columns: .7fr 1.3fr; gap: 56px; align-items: start; padding: 72px 0 128px; border-top: 1px solid var(--line); }
+.walkthrough > div { position: sticky; top: 32px; }
 .walkthrough > div > p:last-child { color: var(--mist); font-size: 18px; }
-.walkthrough-frames { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0; padding: 0; list-style: none; }
-.walkthrough-frames li { display: grid; min-height: 180px; align-content: end; gap: 8px; padding: 20px; border: 1px solid var(--line); background: linear-gradient(145deg, #27312e, #111514 60%); box-shadow: inset 0 0 0 8px rgba(255,255,255,.015); }
-.walkthrough-frames li:nth-child(2) { background: linear-gradient(145deg, #4b3d29, #161513 60%); }.walkthrough-frames li:nth-child(3) { background: linear-gradient(145deg, #3a4c49, #111514 60%); }.walkthrough-frames li:nth-child(4) { background: linear-gradient(145deg, #42382e, #111514 60%); }
-.walkthrough-frames span { align-self: start; color: var(--projector); font: 700 12px ui-monospace, monospace; }.walkthrough-frames strong { font-family: var(--display); font-size: 21px; }.walkthrough-frames small { color: var(--mist); font-size: 14px; }
+.walkthrough-frames { display: grid; gap: 32px; margin: 0; padding: 0; list-style: none; }
+.walkthrough-frames figure { margin: 0; overflow: hidden; border: 1px solid var(--line); background: var(--surface); box-shadow: 0 24px 56px rgba(0,0,0,.24); }
+.walkthrough-frames img { display: block; width: 100%; height: auto; aspect-ratio: 1280 / 820; border-bottom: 1px solid var(--line); background: #101313; object-fit: cover; }
+.walkthrough-frames figcaption { display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding: 16px 20px 18px; }
+.walkthrough-frames figcaption > span { padding-top: 4px; color: var(--projector); font: 700 12px ui-monospace, monospace; letter-spacing: .06em; }
+.walkthrough-frames figcaption div { display: grid; gap: 4px; }
+.walkthrough-frames strong { font-family: var(--display); font-size: 21px; }
+.walkthrough-frames small { color: var(--mist); font-size: 14px; }
 .tick-list li { position: relative; padding-left: 28px; }.tick-list li::before { content: "✓"; position: absolute; left: 0; color: var(--signal); }
 .download-section { display: grid; grid-template-columns: 1fr .8fr; gap: 96px; align-items: center; padding: 72px; border: 1px solid var(--line); background: radial-gradient(circle at 90% 0, rgba(255,179,92,.12), transparent 33%), var(--surface); }
 .download-section > div:first-child p:last-child { max-width: 570px; color: var(--mist); }
@@ -66,7 +71,7 @@
 
 @media (max-width: 920px) {
   .hero { grid-template-columns: 1fr; padding-top: 64px; }.hero-scene { width: 90%; margin-left: auto; }.hero-scene img { max-height: 520px; }
-  .how-section, .frame-demo, .walkthrough, .download-section, .pricing-section { grid-template-columns: 1fr; gap: 48px; }.section-kicker { position: static; }.frame-demo .demo-screen { order: 2; }
+  .how-section, .frame-demo, .walkthrough, .download-section, .pricing-section { grid-template-columns: 1fr; gap: 48px; }.section-kicker, .walkthrough > div { position: static; }.frame-demo .demo-screen { order: 2; }
   .download-section { padding: 48px; }.download-card { padding: 32px 0 0; border-top: 1px solid var(--line); border-left: 0; }.pricing-section { grid-template-columns: 1fr; }.price-card { max-width: 520px; }
 }
 @media (max-width: 640px) {
@@ -75,7 +80,7 @@
   .hero { min-height: auto; gap: 44px; padding-block: 56px 72px; }.hero h1 { font-size: clamp(3rem, 14vw, 4.2rem); }.hero-actions { align-items: stretch; flex-direction: column; }.hero-actions a { width: 100%; }.hero-scene { width: 100%; }.hero-scene::before { inset: -8px 16px 16px -8px; }.hero-scene figcaption span:last-child { display: none; }
   .proof-strip { grid-template-columns: 1fr; }.proof-strip p { padding: 20px 8px; }.proof-strip p + p { border-top: 1px solid var(--line); border-left: 0; }
   .how-section, .pricing-section { padding-block: 88px; }.process li { grid-template-columns: 40px 1fr; gap: 12px; }
-  .frame-demo, .walkthrough { padding-bottom: 88px; }.demo-screen { min-height: 260px; }.demo-warning { display: none; }.demo-caption { font-size: 13px; }.walkthrough-frames { grid-template-columns: 1fr; }.walkthrough-frames li { min-height: 128px; }
+  .frame-demo, .walkthrough { padding-bottom: 88px; }.demo-screen { min-height: 260px; }.demo-warning { display: none; }.demo-caption { font-size: 13px; }.walkthrough-frames { gap: 24px; }.walkthrough-frames figcaption { padding-inline: 16px; }
   .download-section { width: 100%; padding: 48px 16px; border-inline: 0; }.download-section > div { width: min(100% - 16px, 560px); margin-inline: auto; }.platform-links { gap: 14px; }
   .price-card { padding: 24px 20px; }.honesty { padding: 40px 24px; }.site-footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 20px; }.site-footer nav { flex-wrap: wrap; gap: 4px 20px; }
 }

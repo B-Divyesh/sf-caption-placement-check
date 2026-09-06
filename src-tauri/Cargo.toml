@@ -1,6 +1,6 @@
 [package]
 name = "caption-placement-check"
-version = "0.1.5"
+version = "0.1.6"
 description = "Check caption placement on local video"
 authors = ["Sociobot"]
 license = "MIT"

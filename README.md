@@ -17,10 +17,14 @@ Try the isolated sample: <https://caption-placement-check.sociobot.in/?demo=1>. 
 - Lets you mark protected regions with a pointer or keyboard.
 - Suggests a safer caption position for each alert.
 - Exports alerts as CSV and project details as JSON without an account.
+- Reloads the browser checker offline after its first visit and checks chosen files.
+- Includes the same sample and checker in the packaged offline desktop app.
 
 ## Run locally
 
 Install Node.js 22+, npm, Rust, and the [Tauri 2 system dependencies](https://v2.tauri.app/start/prerequisites/) (external).
+
+On Debian or Ubuntu, the packaged offline test also needs `xvfb` and `dpkg`.
 
 ```sh
 npm ci
@@ -34,6 +38,7 @@ npm run tauri dev    # native desktop window
 ```sh
 npm test
 npm run test:e2e
+npm run test:desktop-offline
 npm run test:benchmark
 npm run check
 npm run build

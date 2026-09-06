@@ -132,30 +132,58 @@ test("@claim:no-tracking allows release data but no analytics or third-party fon
   expect(requests.map((request) => request.url).join("\n")).not.toMatch(/google-analytics|googletagmanager|segment|mixpanel|plausible|posthog/i);
 });
 
-test("@claim:offline-demo reloads the shipped demo after its first visit", async ({ page, context }) => {
-  await page.goto("/");
-  await page.evaluate(async () => {
-    await Promise.all((await navigator.serviceWorker.getRegistrations()).map((registration) => registration.unregister()));
-    await Promise.all((await caches.keys()).map((key) => caches.delete(key)));
-  });
-  await page.goto("/?demo=1");
-  await expect(page.locator("#scan-summary")).toContainText("2 captions checked", { timeout: 20_000 });
-  await expect.poll(() => page.locator("html").getAttribute("data-offline-ready")).toBe("true");
-  expect(await page.evaluate(async () => {
-    const cache = await caches.open("caption-placement-check-v10");
-    const assets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
-      .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
-    return Promise.all(assets.map(async (asset) => {
-      const cached = await cache.match(asset);
-      return Boolean(cached) && !cached!.headers.has("content-encoding");
-    }));
-  })).toEqual([true, true]);
-  await context.setOffline(true);
-  await page.reload();
-  await expect(page).toHaveTitle("Demo — Caption Placement Check", { timeout: 20_000 });
-  await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
-  await expect(page.locator("#findings li")).toHaveCount(2);
-  await context.setOffline(false);
+test("@claim:offline-demo reloads the shipped demo after its first visit", async ({ browser }) => {
+  const context = await browser.newContext({ baseURL: origin });
+  const page = await context.newPage();
+  try {
+    await page.goto("/");
+    await page.evaluate(async () => {
+      await Promise.all((await navigator.serviceWorker.getRegistrations()).map((registration) => registration.unregister()));
+      await Promise.all((await caches.keys()).map((key) => caches.delete(key)));
+    });
+    await page.goto("/?demo=1");
+    await expect(page.locator("#scan-summary")).toContainText("2 captions checked", { timeout: 20_000 });
+    await expect.poll(() => page.locator("html").getAttribute("data-offline-ready")).toBe("true");
+    expect(await page.evaluate(async () => {
+      const cache = await caches.open("caption-placement-check-v11");
+      const assets = [...document.querySelectorAll<HTMLScriptElement | HTMLLinkElement>("script[src], link[rel=stylesheet][href]")]
+        .map((element) => "src" in element && element.src ? element.src : (element as HTMLLinkElement).href);
+      return Promise.all(assets.map(async (asset) => {
+        const cached = await cache.match(asset);
+        return Boolean(cached) && !cached!.headers.has("content-encoding");
+      }));
+    })).toEqual([true, true]);
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page).toHaveTitle("Demo — Caption Placement Check", { timeout: 20_000 });
+    await expect(page.getByText("Demo — sample data, nothing is saved")).toBeVisible();
+    await expect(page.locator("#findings li")).toHaveCount(2);
+  } finally {
+    await context.close();
+  }
+});
+
+test("@claim:offline-real-check checks chosen files after an offline reload", async ({ browser }) => {
+  const context = await browser.newContext({ baseURL: origin });
+  const page = await context.newPage();
+  try {
+    await page.goto("/check/");
+    await page.evaluate(async () => {
+      await Promise.all((await navigator.serviceWorker.getRegistrations()).map((registration) => registration.unregister()));
+      await Promise.all((await caches.keys()).map((key) => caches.delete(key)));
+    });
+    await page.reload();
+    await expect.poll(() => page.locator("html").getAttribute("data-offline-ready")).toBe("true");
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByText("Offline · local checks still work")).toBeVisible();
+    await scan(page, "tests/benchmark/critical.srt", "tests/benchmark/media/cpc-01.webm");
+    await expect(page.locator("#scan-summary")).toContainText("1 caption checked · 1 alert needs review");
+    const { content } = await downloadText(page, "Export alerts as CSV");
+    expect(content.trim().split("\n")).toHaveLength(2);
+  } finally {
+    await context.close();
+  }
 });
 
 test("@claim:release-fallback links to Releases for failed and empty metadata without console errors", async ({ page }) => {
@@ -236,6 +264,23 @@ test("first-screen action remains visible at 390px", async ({ page }) => {
   const action = page.getByRole("link", { name: "Try it with sample data" });
   await expect(action).toBeVisible();
   expect((await action.boundingBox())!.y + (await action.boundingBox())!.height).toBeLessThan(844);
+});
+
+test("desktop walkthrough renders three captioned app screenshots", async ({ page }) => {
+  await page.route(releaseApi, (route) => route.abort());
+  await page.goto("/");
+  const frames = page.locator(".walkthrough-frames figure");
+  await expect(frames).toHaveCount(3);
+  await frames.last().scrollIntoViewIfNeeded();
+  for (const frame of await frames.all()) {
+    await expect(frame.locator("img")).toBeVisible();
+    await expect(frame.locator("figcaption strong")).toBeVisible();
+    expect(await frame.locator("img").evaluate((image: HTMLImageElement) => ({
+      complete: image.complete,
+      width: image.naturalWidth,
+      height: image.naturalHeight
+    }))).toEqual({ complete: true, width: 1280, height: 820 });
+  }
 });
 
 test("@claim:local-scan exports two complete CSV alert rows", async ({ page }) => {

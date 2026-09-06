@@ -48,6 +48,7 @@ At desktop widths the frame and cue list share the bench. Below 860px they stack
 - Hero: original 3:2 environmental illustration generated with the factory Azure image deployment on 2026-08-28. Prompt sheet below. Source PNG and prompt JSON live in `assets/src/`; optimized WebP lives in `public/assets/`.
 - Social preview: original 1200×630 projection-theatre crop generated with the same factory deployment on 2026-08-28, reviewed for text artifacts, brands, and unintended symbols. It contains no readable text, logos, or identifiable people. Prompt provenance is `public/assets/social-projection-room.png.json`; the final PNG is a crop composed from that original render.
 - App mark and interface icons: hand-authored geometric SVG/CSS (frame corners, alert mark, arrows), MIT-covered with this repository. The 180px touch icon is a raster export of that mark.
+- Desktop walkthrough: direct 1280×820 captures from the packaged Linux desktop app under Xvfb on 2026-09-06. They show the real first-run sample, populated alert review, and reviewed state; no content was composited or invented.
 - No stock assets, third-party logos, real people, or copyrighted characters.
 
 ### Hero prompt sheet

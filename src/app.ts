@@ -1,5 +1,6 @@
 import "./styles.css";
 import "./shell";
+import { invoke } from "@tauri-apps/api/core";
 import {
   captionRegion, findingToCsv, formatTime, intersectionRatio, parseCaptions, recommendZone,
   type CaptionCue, type Finding, type FindingKind, type Region
@@ -419,8 +420,15 @@ $("#export-json").addEventListener("click", () => download("caption-placement-pr
   captionFile: captionFile?.name, protectedRegions, findings
 }, null, 2)));
 
-window.addEventListener("offline", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Offline · local checks still work"; });
-window.addEventListener("online", () => { document.querySelector(".local-badge")!.innerHTML = "<span aria-hidden=\"true\">●</span> Checks media on this device"; });
+function updateNetworkStatus() {
+  document.querySelector(".local-badge")!.innerHTML = navigator.onLine
+    ? "<span aria-hidden=\"true\">●</span> Checks media on this device"
+    : "<span aria-hidden=\"true\">●</span> Offline · local checks still work";
+}
+
+window.addEventListener("offline", updateNetworkStatus);
+window.addEventListener("online", updateNetworkStatus);
+updateNetworkStatus();
 
 async function loadSampleProject() {
   // Vite copies the shipped sample under public/demo/. This relative form
@@ -453,6 +461,53 @@ async function startDemo() {
 }
 
 if (isDemo) void startDemo();
+
+async function runPackagedOfflineSmoke() {
+  if (!("__TAURI_INTERNALS__" in window)) return;
+  try {
+    if (!await invoke<boolean>("offline_smoke_enabled")) return;
+  } catch {
+    return;
+  }
+
+  const nativeFetch = window.fetch.bind(window);
+  const localRequests: string[] = [];
+  const blockedExternalRequests: string[] = [];
+  window.fetch = (input, init) => {
+    const raw = input instanceof Request ? input.url : input instanceof URL ? input.href : String(input);
+    const url = new URL(raw, location.href);
+    if (url.origin !== location.origin) {
+      blockedExternalRequests.push(url.href);
+      return Promise.reject(new TypeError("External network access is disabled for the offline smoke test."));
+    }
+    localRequests.push(url.href);
+    return nativeFetch(input, init);
+  };
+
+  try {
+    await loadSampleProject();
+    await invoke("complete_offline_smoke", { result: {
+      passed: cues.length === 2 && findings.length === 2,
+      captionCount: cues.length,
+      alertCount: findings.length,
+      summary: $("#scan-summary").textContent,
+      sampleLoaded: sampleProjectLoaded,
+      localRequestCount: localRequests.length,
+      blockedExternalRequests
+    } });
+  } catch (error) {
+    await invoke("complete_offline_smoke", { result: {
+      passed: false,
+      error: error instanceof Error ? error.message : "The packaged sample check failed.",
+      captionCount: cues.length,
+      alertCount: findings.length,
+      localRequestCount: localRequests.length,
+      blockedExternalRequests
+    } });
+  }
+}
+
+if (!isDemo) void runPackagedOfflineSmoke();
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => {
   void navigator.serviceWorker.register("/sw.js").then(async () => {
